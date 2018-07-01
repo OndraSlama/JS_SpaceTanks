@@ -23,15 +23,6 @@ function setup() {
     //Dynamic button
     texts.push(new Title('SpaceTanks', width/2, height/2, 100));
 
-
-    // Buttons
-    planetButton = createButton("Create Planets");    
-    tankButton = createButton("Create Tanks");
-
-    // Buttons callbacks
-    planetButton.mouseClicked(createPlanets);
-    tankButton.mouseClicked(createTanks);
-
     // Game settings
     redPlayerControls = [87, 83, 68, 65, 32];
     bluePlayerControld = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];
@@ -40,10 +31,10 @@ function setup() {
 }
 
 // Arrays
-// let planets = [];
-// let tanks = [];
-// let players = [];
-// let explosions = [];
+let planets = [];
+let tanks = [];
+let players = [];
+let explosions = [];
 let games = [];
 
 // Parameters
@@ -71,35 +62,35 @@ function draw() {
         t.update();
     }
 
-    for(let g of games){
-        g.play();
+    // for(let g of games){
+    //     g.play();
+    // }
+
+    for(let i = planets.length - 1; i >= 0; i--){       
+        planets[i].move();        
+        planets[i].show();
     }
 
-    // for(let i = planets.length - 1; i >= 0; i--){       
-    //     planets[i].move();        
-    //     planets[i].show();
-    // }
-
-    // for(let i = tanks.length - 1; i >= 0; i--){
-    //     if(tanks[i].hp > 0){
-    //         tanks[i].control();
-    //         tanks[i].show();
-    //     }else{
-    //         tanks[i].explode();
-    //         tanks[i].parentPlayer.score++;
-    //     }        
-    //     for(let j = tanks.length - 1; j >= 0; j--){
-    //         tanks[i].updateProjectiles(tanks[j]);
-    //     }
+    for(let i = tanks.length - 1; i >= 0; i--){
+        if(tanks[i].hp > 0){
+            tanks[i].control();
+            tanks[i].show();
+        }else{
+            tanks[i].explode();
+            tanks[i].parentPlayer.score++;
+        }        
+        for(let j = tanks.length - 1; j >= 0; j--){
+            tanks[i].updateProjectiles(tanks[j]);
+        }
         
-    // }
+    }
 
-    // for(let i = explosions.length - 1; i >= 0; i--){
-    //     for (let t of tanks){
-    //         explosions[i].dealDamage(t);
-    //     }
-    //     explosions[i].show();
-    //     if (explosions[i].alfa <= 0) explosions.splice(i, 1);
-    // }
+    for(let i = explosions.length - 1; i >= 0; i--){
+        for (let t of tanks){
+            explosions[i].dealDamage(t);
+        }
+        explosions[i].show();
+        if (explosions[i].alfa <= 0) explosions.splice(i, 1);
+    }
 
 }
