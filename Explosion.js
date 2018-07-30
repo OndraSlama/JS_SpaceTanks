@@ -2,32 +2,38 @@ class Explosion {
     constructor(pos, time, maxR, damage){
         this.pos = pos;
         this.time = time;
-        this.maxDiameter = maxR;
-        this.r = 0;
+        this.maxRad = maxR;
+        this.rad = 0;
         this.alfa = 255;
         this.maxDamage = damage;        
     }
 
     show(){
-        this.r += 5;
-        if (this.r > this.maxDiameter) this.r = this.maxDiameter;
+        this.rad += 5;
+        if (this.rad > this.maxRad) this.rad = this.maxRad;
         this.alfa -= 255/(this.time * frameRate());        
         
         push();
-        fill(200, 10, 10, this.alfa);
+        fill(150, 50, 50, this.alfa);
         stroke(0, this.alfa);
-        ellipse(this.pos.x, this.pos.y, this.r);        
+        ellipse(this.pos.x, this.pos.y, this.rad * 2);        
         pop();
     }
 
-    dealDamage(tank){
-        let d = this.pos.dist(tank.absolutePos);
-        let coverage = this.maxDiameter + tank.hitBoxRadius;
-        
-        if ((d < coverage/2) && this.maxDamage != 0){ 
-            tank.hp -= this.maxDamage * ((coverage - d)/this.maxDiameter);
-            this.maxDamage = 0;
-        }        
+    dealDamage(){
+        for (let t of tanks) {
+            let d = this.pos.dist(t.absolutePos);
+            let maxDistanceToOverlap = this.maxRad + t.hitBoxRadius;
+
+            if ((d < maxDistanceToOverlap) && this.maxDamage != 0) {
+                t.hp -= this.maxDamage * ((maxDistanceToOverlap - d) / this.maxRad);
+                this.maxDamage = 0;
+            }
+        }
+    }
+
+    disappear(i){
+        if (this.alfa <= 0) explosions.splice(i, 1);
     }
 
 }

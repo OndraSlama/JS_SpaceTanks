@@ -13,7 +13,7 @@ class Planet {
 
     show() {        
         fill(this.color);        
-        ellipse(this.pos.x, this.pos.y, this.rad);      
+        ellipse(this.pos.x, this.pos.y, this.rad * 2);      
     }
 
     move() {

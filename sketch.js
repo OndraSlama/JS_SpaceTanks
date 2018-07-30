@@ -1,3 +1,4 @@
+// @ts-nocheck
 let canvasHeight = 600;
 let canvasWidth = 400;
 let redPlayerControls = [];
@@ -21,11 +22,11 @@ function setup() {
     textAlign(CENTER, CENTER);
     
     //Dynamic button
-    texts.push(new Title('SpaceTanks', width/2, height/2, 100));
+    texts.push(new Title('SpaceTanks', width/2, height/2, canvasHeight*0.15));
 
     // Game settings
     redPlayerControls = [87, 83, 68, 65, 32];
-    bluePlayerControld = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];
+    bluePlayerControls = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];
 
 
 }
@@ -40,10 +41,11 @@ let games = [];
 // Parameters
 let projectileRadius = 10;
 let projectileMass = 10;
-let planetRadius = canvasHeight/8;
+let planetRadius = canvasHeight/16;
 let planetMass;
 let maxPlanets = 10;
 
+// Behaviors
 let G = 0.03;
 let bounceDamp = 0.9;
 let impulseDamp = 0.5;
@@ -77,20 +79,17 @@ function draw() {
             tanks[i].show();
         }else{
             tanks[i].explode();
-            tanks[i].parentPlayer.score++;
         }        
         for(let j = tanks.length - 1; j >= 0; j--){
             tanks[i].updateProjectiles(tanks[j]);
-        }
-        
+            tanks[i].updateRuins(tanks[j]);
+        }        
     }
 
-    for(let i = explosions.length - 1; i >= 0; i--){
-        for (let t of tanks){
-            explosions[i].dealDamage(t);
-        }
+    for(let i = explosions.length - 1; i >= 0; i--){        
+        explosions[i].dealDamage();       
         explosions[i].show();
-        if (explosions[i].alfa <= 0) explosions.splice(i, 1);
+        explosions[i].disappear(i);
     }
 
 }
