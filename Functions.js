@@ -14,7 +14,7 @@ function createGameSesion(numberOfPlayers){
 function settingsMenu(){    
     clearMenu();
     texts.push(new Mode('1 Player', width*0.28, height*0.5, 70, "red", 3, 1));
-    texts.push(new Mode('2 Players', width*0.77, height*0.5, 70, "blue", 3, 2));    
+    texts.push(new Mode('2 Players', width*0.77, height*0.5, 70, "blue", 3, 2));
 }
 
 function clearMenu(){
