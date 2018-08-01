@@ -1,21 +1,31 @@
 class Tank {
-    constructor(a, p){        
+    constructor(a, p, game){        
+        
+        this.game = game;
+
         // Tank parameters
         this.planet = p;
-        this.relativeAngle = 45; //random(0, 2*PI)
-        this.relativeVel = 1;
-        this.barrelAngle = 45;
-        this.barrelVel = 1;
-        this.absolutePos = createVector();
-        this.absoluteAngle = 0;
+        this.invMass = 0;        
         this.tankSize = width*0.025;
         this.barrelLength = this.tankSize/1.15;
         this.barrelWidth = this.barrelLength/4;      
-        this.hitBoxRadius = this.tankSize*0.5;
+        this.hitBoxRadius = this.tankSize*0.7;
         this.shotPower = 0;
         this.maxShotPower = 10;
-        this.hp = 100;
+        this.maxHp = 100;
+        this.hp = this.maxHp;
         
+        // State variables
+        this.pos = createVector();
+        this.vel = createVector();
+        this.barrelPos = createVector();
+        this.rad = this.hitBoxRadius;
+        this.relativeAngle = random(0, 360);
+        this.relativeVel = 1;
+        this.barrelAngle = 45;
+        this.barrelVel = 1;
+        this.absoluteAngle = 0;
+
         // Statuses
         this.exploded = 0;
 
@@ -60,18 +70,29 @@ class Tank {
         rotate(this.barrelAngle); // rotate so the barrel is parallel with X axis
 
         fill(this.parentPlayer.color);                
-        strokeWeight(this.barrelWidth); 
+        strokeWeight(this.barrelWidth);       
         line(0, 0, this.barrelLength, 0); // draw barrel
+        
         rectMode(CENTER);
-        rect(this.barrelLength, 0, this.barrelWidth/3, this.barrelWidth/3);  // draw the tip of the barrel  
+        rect(this.barrelLength, 0, this.barrelWidth/3, this.barrelWidth/3);  // draw the tip of the barrel 
+        
+        // Draw power bar        
+        let powerBarLength = map(this.shotPower, 0.1, this.maxShotPower, tankHeight*0.4, this.barrelLength + this.barrelWidth/3)
+        if (powerBarLength < 0) powerBarLength = 0;        
+        stroke(this.parentPlayer.color);
+        line(0, 0, powerBarLength, 0); // draw barrel
 
-        rotate(-this.barrelAngle); // rotate back to tank Angle
+        let tipOfBarrelLength = powerBarLength - (this.barrelLength - this.barrelWidth/3);
+        if (tipOfBarrelLength < 0) tipOfBarrelLength = 0;
+        rectMode(CORNER);   
+        rect(-this.barrelWidth/3, -this.barrelWidth/3, tipOfBarrelLength, this.barrelWidth/3);
+
+        stroke("black");
         strokeWeight(this.tankSize/10);
+        rotate(-this.barrelAngle); // rotate back to tank Angle
         ellipse(0, 0, tankHeight, tankWidth* 2/3); // draw cokpit
 
         translate(-tankHeight, 0); // translate back to point 1
-        strokeWeight(this.tankSize/10);       
-        stroke(0);    
         rectMode(CORNER);
         ellipse(tankHeight/2, tankWidth/2, tankHeight); // draw rounded ends of the body
         ellipse(tankHeight/2, -tankWidth/2, tankHeight); 
@@ -81,12 +102,15 @@ class Tank {
         ellipse(tankHeight/2, -tankWidth/2, tankHeight -this.tankSize/12, tankHeight/2);
 
         // Draw power bar
-        let powerBarLength = map(this.shotPower, 0.1, this.maxShotPower, 0, this.tankSize * 1.2)
-        if (powerBarLength < 0) powerBarLength = 0;        
-
+        let healthBarLength = map(this.hp, 0, this.maxHp, 0, this.tankSize * 1.2)       
         fill(this.parentPlayer.color);
-        rect(-tankHeight * 0.8, -tankWidth * 0.6, tankHeight * 0.5, powerBarLength);
-        pop();        
+        rect(-tankHeight * 0.8, -tankWidth * 0.6, tankHeight * 0.5, healthBarLength);
+        pop();     
+        
+        // Draw trajectory
+        if (keyIsDown(this.parentPlayer.SHOOT)){            
+            this.showTrajectory()
+        }        
     }
 
     control(){
@@ -100,28 +124,32 @@ class Tank {
         if(abs(this.barrelAngle) > 90) this.barrelAngle = sign(this.barrelAngle)*90;
 
         // Update absolute position
-        this.absoluteAngle = this.relativeAngle + this.barrelAngle; 
-
-        let relativeTankVector = p5.Vector.fromAngle(radians(this.relativeAngle), this.planet.rad + this.tankSize/2);
-        this.absolutePos = p5.Vector.add(this.planet.pos, relativeTankVector); 
+        this.updatePositions();
 
         // Shot
         if (keyIsDown(this.parentPlayer.SHOOT)){
             this.shotPower += .05;
             if (this.shotPower > this.maxShotPower) this.shotPower = this.maxShotPower;
-            // Draw trajectory
-            this.showTrajectory();
         }else if (this.shotPower > 0){
             this.shoot();
             this.shotPower = 0;
         }
     }
 
-    shoot(){
+    updatePositions(){
+        this.absoluteAngle = this.relativeAngle + this.barrelAngle; 
+
+        let relativeTankVector = p5.Vector.fromAngle(radians(this.relativeAngle), this.planet.rad);
+        this.pos = p5.Vector.add(this.planet.pos, relativeTankVector); 
+
+        let relativeMiddleVector = p5.Vector.fromAngle(radians(this.relativeAngle), this.tankSize/2);
         let relativeBarrelVector = p5.Vector.fromAngle(radians(this.absoluteAngle), this.barrelLength);        
-        let pos = p5.Vector.add(this.absolutePos, relativeBarrelVector);
+        this.barrelPos = p5.Vector.add(p5.Vector.add(this.pos, relativeMiddleVector), relativeBarrelVector);
+    }
+
+    shoot(){        
         let shot = p5.Vector.fromAngle(radians(this.absoluteAngle), this.shotPower);
-        this.projectiles.push(new Projectile(pos, shot, this));
+        this.projectiles.push(new Projectile(this.barrelPos, shot, this));
     }
 
     updateProjectiles(other){
@@ -131,27 +159,35 @@ class Tank {
                     this.projectiles[q].resolveCollision(this.projectiles[j]);
                 }
             }
-            for(let k of planets){
+            for(let k of this.game.planets){
                 this.projectiles[q].resolveCollision(k);
+                this.projectiles[q].gravityForce(k);
             } 
             for(let l of other.projectiles){
                 if (this != other){
                     this.projectiles[q].resolveCollision(l);
                 }
             }  
-            for(let t of tanks){
+            for(let t of this.game.tanks){
                 this.projectiles[q].resolveHit(t);
+                if (this != t) {
+                    this.projectiles[q].resolveCollision(t);
+                }
             }  
 
-            this.projectiles[q].wrap();
-            this.projectiles[q].gravityForce();
+            this.projectiles[q].wrap();            
             this.projectiles[q].airResistance();
-            this.projectiles[q].move();        
-            this.projectiles[q].show();              
+            this.projectiles[q].move();               
             if(this.projectiles[q].life <= 0){
                 this.projectiles[q].explode();
                 this.projectiles.splice(q,1);
             } 
+        }
+    }
+
+    showProjectiles(){
+        for(let q = this.projectiles.length - 1; q >= 0; q--){
+            this.projectiles[q].show(); 
         }
     }
 
@@ -162,21 +198,30 @@ class Tank {
                     this.ruins[q].resolveCollision(this.ruins[j]);
                 }
             }
-            for(let k of planets){
+            for(let k of this.game.planets){
                 this.ruins[q].resolveCollision(k);
+                this.ruins[q].gravityForce(k);
             } 
             for(let l of other.projectiles){
                 if (this != other){
                     this.ruins[q].resolveCollision(l);
                 }
             }  
+            for(let t of this.game.tanks){
+                if (this != t) {
+                    this.ruins[q].resolveCollision(t);
+                }
+            } 
 
-            this.ruins[q].wrap();
-            this.ruins[q].gravityForce();
+            this.ruins[q].wrap();            
             this.ruins[q].airResistance();
-            this.ruins[q].move();        
-            this.ruins[q].show();          
-           
+            this.ruins[q].move();  
+        }
+    }
+
+    showRuins(){
+        for(let q = this.ruins.length - 1; q >= 0; q--){ 
+            this.ruins[q].show();
         }
     }
 
@@ -186,34 +231,33 @@ class Tank {
 
     explode(){
         if (!this.exploded){
-            for (let o = 0; o < 40; o++){
+            for (let o = 0; o < 20; o++){
                 let X = random(-10,10);
                 let Y = random(-10,10);
                 let vel = createVector(X*0.6,Y*0.6);
-                let pos = createVector(this.absolutePos.x + X, this.absolutePos.y + Y);
-                this.projectiles.push(new Ruin(pos, vel, this));
+                let pos = createVector(this.pos.x + X, this.pos.y + Y);
+                this.ruins.push(new Ruin(pos, vel, this));
             }
-            explosions.push(new Explosion(this.absolutePos, 2, this.tankSize*100, 0));
+            this.game.explosions.push(new Explosion(this.pos, 2, this.tankSize*100, 0, this.game));
             this.exploded = 1;
+            console.log("Tank exploded");
         }
     }
 
     showTrajectory(){
-        this.trajectory.splice(0, this.trajectory.length);
-        let relativeBarrelVector = p5.Vector.fromAngle(radians(this.absoluteAngle), this.barrelLength);        
-        let pos = p5.Vector.add(this.absolutePos, relativeBarrelVector);
+        this.trajectory.splice(0, this.trajectory.length);        
         let shot = p5.Vector.fromAngle(radians(this.absoluteAngle), this.shotPower);
-        let particle = new Projectile(pos, shot, this);
+        let particle = new Projectile(this.barrelPos, shot, this);
         let showEvery = 8;
 
         for(let i = 0; i < showEvery*this.trajectoryLength; i++ ){
 
-            for(let k of planets){
+            for(let k of this.game.planets){
                 particle.resolveCollision(k);
+                particle.gravityForce(k);
             }            
             
-            particle.wrap();
-            particle.gravityForce();
+            particle.wrap();           
             particle.airResistance();
             particle.move();
 

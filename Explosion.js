@@ -1,5 +1,6 @@
 class Explosion {
-    constructor(pos, time, maxR, damage){
+    constructor(pos, time, maxR, damage, game){
+        this.game = game;
         this.pos = pos;
         this.time = time;
         this.maxRad = maxR;
@@ -8,11 +9,7 @@ class Explosion {
         this.maxDamage = damage;        
     }
 
-    show(){
-        this.rad += 5;
-        if (this.rad > this.maxRad) this.rad = this.maxRad;
-        this.alfa -= 255/(this.time * frameRate());        
-        
+    show(){   
         push();
         fill(150, 50, 50, this.alfa);
         stroke(0, this.alfa);
@@ -20,9 +17,15 @@ class Explosion {
         pop();
     }
 
+    update(){
+        this.rad += 5;
+        if (this.rad > this.maxRad) this.rad = this.maxRad;
+        this.alfa -= 255/(this.time * frameRate());
+    }
+
     dealDamage(){
-        for (let t of tanks) {
-            let d = this.pos.dist(t.absolutePos);
+        for (let t of this.game.tanks) {
+            let d = this.pos.dist(t.pos);
             let maxDistanceToOverlap = this.maxRad + t.hitBoxRadius;
 
             if ((d < maxDistanceToOverlap) && this.maxDamage != 0) {
@@ -32,8 +35,5 @@ class Explosion {
         }
     }
 
-    disappear(i){
-        if (this.alfa <= 0) explosions.splice(i, 1);
-    }
 
 }

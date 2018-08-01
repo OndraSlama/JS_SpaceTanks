@@ -1,20 +1,21 @@
-function createGameSesion(numberOfPlayers){
-    clearMenu();
-     if(numberOfPlayers == 1){
-        players.push(new Player('red', redPlayerControls));
-        // players.push(new Player('blue', bluePlayerControld));
-     }else if(numberOfPlayers == 2){
-        players.push(new Player('red', redPlayerControls));
-        players.push(new Player('black', bluePlayerControls));
-    }
-    createPlanets();
-    createTanks();
+function createGameSesion(numberOfPlayers){    
+    games.push(new Game(numberOfPlayers));
+    console.log("Created game sesion");
 }
 
 function settingsMenu(){    
     clearMenu();
     texts.push(new Mode('1 Player', width*0.28, height*0.5, 70, "red", 3, 1));
     texts.push(new Mode('2 Players', width*0.77, height*0.5, 70, "blue", 3, 2));
+}
+
+function homeMenu(){
+    clearMenu();
+    endGameSesions();
+    texts.push(new Text('SpaceTanks', width/2, height*0.2, canvasHeight*0.15));
+
+    texts.push(new Play("Quck play", width/2, height * 0.5))
+    texts.push(new Settings("Advanced Settings", width/2, height * 0.75))
 }
 
 function clearMenu(){
@@ -24,10 +25,17 @@ function clearMenu(){
     texts.splice(0, text.length);
 }
 
+function endGameSesions(){
+    for(let g of games){
+        g.end();
+    }
+    games.splice(0, games.length);
+}
+
 function runFromMouse(){
     for (let t of texts){
         // t.force = 400;
-        t.additiveDist = 15;
+        t.additiveDist = 10;
     }
 }
 

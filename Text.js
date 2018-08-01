@@ -1,5 +1,5 @@
 class Text {
-    constructor(string, x, y, size = 20, color, radius = size*0.04){
+    constructor(string, x, y, size = height * 0.10, color = "white", radius = size*0.07){
         this.dots = [];
         let tempDots = font.textToPoints(string, x-size*string.length*0.25, y + size*0.2, size);
         for(let q of tempDots){
@@ -11,10 +11,10 @@ class Text {
         this.up = this.down - size*0.7;
         this.left = this.dots[0].target.x;
         this.right = this.dots[this.dots.length-1].target.x;
-        this.force = 500;
-        this.maxSpeed = 8;
-        this.minSpeed = .2;
-        this.stayAwaydist = 20;
+        this.force = 100;
+        this.maxSpeed = 6;
+        this.minSpeed = .1;
+        this.stayAwaydist = size/8;
         this.additiveDist = 0;
     }
 
@@ -38,7 +38,7 @@ class Text {
             d.move();
             //d.wrap();
             d.seekTarget(this.force, this.maxSpeed, this.minSpeed);
-            d.runFromTarget(this.force, this.stayAwaydist*1.4, mouse);
+            d.runFromTarget(this.force, this.stayAwaydist*2, mouse);
             d.stayAwayFromTarget(this.stayAwaydist, mouse);            
             // for(let q of this.dots){                
             //     d.resolveCollision(q);
@@ -59,18 +59,18 @@ class Text {
     }
 
     clickFunction(){
-        runFromMouse();
+        //runFromMouse();
     }
 }
 
-class Title extends Text {
+class Play extends Text {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
       }
       
       clickFunction(){
-          runFromMouse();
-          setTimeout(settingsMenu, 1000);
+          runFromMouse();          
+          setTimeout(createGameSesion, 1000, 2);
       }
     
 }
@@ -83,7 +83,31 @@ class Mode extends Text {
       
       clickFunction(){
           runFromMouse();
-          setTimeout(createGameSesion, 500, this.value);
+          setTimeout(createGameSesion, 1000, this.value);
+      }
+    
+}
+
+class Settings extends Text {
+    constructor(string, x, y, size, color, diameter, val) {
+        super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
+    }
+      
+      clickFunction(){
+          runFromMouse();
+          setTimeout(settingsMenu, 1000);
+      }
+    
+}
+
+class HomeMenu extends Text {
+    constructor(string, x, y, size, color, diameter) {
+        super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
+      }
+      
+      clickFunction(){
+          runFromMouse();          
+          setTimeout(homeMenu, 1000);
       }
     
 }

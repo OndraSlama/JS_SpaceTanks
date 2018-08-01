@@ -49,14 +49,10 @@ class Particle {
         this.force.add(force);
     }
 
-    gravityForce(pos = this.pos){
-        let gravForce = createVector(0, 0);        
-        for(let p of planets){
-            let tempForce = createVector();
-            tempForce = p5.Vector.sub(p.pos, pos);
-            tempForce.setMag(G * p.mass * this.mass/(tempForce.magSq())); 
-            gravForce.add(tempForce);           
-        }        
+    gravityForce(p, pos = this.pos){
+        let gravForce = createVector(0, 0);   
+        gravForce = p5.Vector.sub(p.pos, pos);
+        gravForce.setMag(G * p.mass * this.mass/(gravForce.magSq()));     
         this.applyForce(gravForce);
     }
 
@@ -140,53 +136,55 @@ class Particle {
         }
     }    
 
-    resolveCollision(other){
-        let d = this.pos.dist(other.pos);
-        let maxDistanceToOverlap = this.rad + other.rad;
+    resolveCollision(other) {
+        if (this != other) {
+            let d = this.pos.dist(other.pos);
+            let maxDistanceToOverlap = this.rad + other.rad;
 
-        if ((d < maxDistanceToOverlap) && (d != 0)){   
-            
-            // Sub one from lifecounter
-            this.life--;
+            if ((d < maxDistanceToOverlap) && (d != 0)) {
 
-            //------------ IMPACT --------------//     
+                // Sub one from lifecounter
+                this.life--;
 
-            // Calculate relative velocity
-            let rv = p5.Vector.sub(other.vel, this.vel);
-            let normal = p5.Vector.sub(other.pos, this.pos);
-            normal.normalize();
-            
-            // Calculate relative velocity in terms of the normal direction
-            let velAlongNormal = p5.Vector.dot(rv, normal)
-            
-            // Do not resolve if velocities are separating
-            if(velAlongNormal > 0) return;
-            
-            // Calculate restitution
-            let e = impulseDamp;
-            
-            // Calculate impulse scalar
-            let j = -(1 + e) * velAlongNormal;
-            j /= this.invMass + other.invMass;
-            
-            // Apply impulse
-            let impulse = p5.Vector.mult(normal, j);
-            this.vel.sub(p5.Vector.mult(impulse, this.invMass));
-            other.vel.add(p5.Vector.mult(impulse, other.invMass)); 
+                //------------ IMPACT --------------//     
 
-            //------------ FRICTION --------------// 
-            // TO DO
-            
-            // Position corection            
-            let percent = 0.7; // usually 20% to 80%
-            let slop = 0.02; // usually 0.01 to 0.1
-            let penetration = maxDistanceToOverlap/2 - d;
-            let correctionMag = max(penetration - slop*maxDistanceToOverlap, 0) / (this.invMass + other.invMass) * percent;
-            let correction = p5.Vector.mult(normal, correctionMag);
+                // Calculate relative velocity
+                let rv = p5.Vector.sub(other.vel, this.vel);
+                let normal = p5.Vector.sub(other.pos, this.pos);
+                normal.normalize();
 
-            this.pos.sub(p5.Vector.mult(correction, this.invMass));
-            other.pos.add(p5.Vector.mult(correction, other.invMass));
-        }        
+                // Calculate relative velocity in terms of the normal direction
+                let velAlongNormal = p5.Vector.dot(rv, normal)
+
+                // Do not resolve if velocities are separating
+                if (velAlongNormal > 0) return;
+
+                // Calculate restitution
+                let e = impulseDamp;
+
+                // Calculate impulse scalar
+                let j = -(1 + e) * velAlongNormal;
+                j /= this.invMass + other.invMass;
+
+                // Apply impulse
+                let impulse = p5.Vector.mult(normal, j);
+                this.vel.sub(p5.Vector.mult(impulse, this.invMass));
+                other.vel.add(p5.Vector.mult(impulse, other.invMass));
+
+                //------------ FRICTION --------------// 
+                // TO DO
+
+                // Position corection            
+                let percent = 0.7; // usually 20% to 80%
+                let slop = 0.02; // usually 0.01 to 0.1
+                let penetration = maxDistanceToOverlap / 2 - d;
+                let correctionMag = max(penetration - slop * maxDistanceToOverlap, 0) / (this.invMass + other.invMass) * percent;
+                let correction = p5.Vector.mult(normal, correctionMag);
+
+                this.pos.sub(p5.Vector.mult(correction, this.invMass));
+                other.pos.add(p5.Vector.mult(correction, other.invMass));
+            }
+        }
     }
 }
 

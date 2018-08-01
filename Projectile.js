@@ -1,6 +1,7 @@
 class Projectile extends Particle{
     constructor (pos, vel = createVector(0, 0), tank) {
         super(pos, vel);
+        this.game = tank.game;
         this.rad = tank.projectileRadius;
         this.color = tank.parentPlayer.color;
         this.mass = tank.projectileMass
@@ -12,7 +13,7 @@ class Projectile extends Particle{
     }   
     
     resolveHit(tank){
-        let d = this.pos.dist(tank.absolutePos);
+        let d = this.pos.dist(tank.pos);
         let coverage = this.rad + tank.hitBoxRadius;
         if (d < coverage){ 
             this.life = 0;
@@ -20,7 +21,7 @@ class Projectile extends Particle{
     }
 
     explode(){
-        explosions.push(new Explosion(this.pos, 1, this.damageRad, this.maxDamage));
+        this.game.explosions.push(new Explosion(this.pos, 1, this.damageRad, this.maxDamage, this.game));
     }
 
     showPath(){
