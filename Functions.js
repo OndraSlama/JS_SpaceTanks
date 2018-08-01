@@ -35,12 +35,20 @@ function endGameSesions(){
 function runFromMouse(){
     for (let t of texts){
         // t.force = 400;
-        t.additiveDist = 10;
+        t.additiveDist = 20;
+    }
+}
+
+function mouseDragged(){
+    for(let t of texts){
+        t.pressed();
     }
 }
 
 function mousePressed(){
-    
+    for(let t of texts){
+        t.pressed();
+    }
 }
 
 function mouseClicked(){    

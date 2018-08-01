@@ -1,18 +1,30 @@
 class Text {
-    constructor(string, x, y, size = height * 0.10, color = "white", radius = size*0.07){
+    constructor(string, x, y, size = height * 0.11, color = "white", radius = size*0.04){
         this.dots = [];
-        let tempDots = font.textToPoints(string, x-size*string.length*0.25, y + size*0.2, size);
+        let tempDots = font.textToPoints(string, x-size*string.length*0.25, y + size*0.2, size, {
+            sampleFactor: .15,
+            simplifyThreshold: 0
+          });
+
+        // Create particles
         for(let q of tempDots){
             let pos = createVector(q.x, q.y)
             let vel = createVector(0, 0);
             this.dots.push(new Dot(pos, radius, color));
         }
-        this.down = y + size*0.2;
-        this.up = this.down - size*0.7;
+
+        // Determine hitbox
         this.left = this.dots[0].target.x;
         this.right = this.dots[this.dots.length-1].target.x;
-        this.force = 100;
-        this.maxSpeed = 6;
+        this.down = y + size*0.2;
+        this.up = this.down - size*0.7;        
+        for(let q of tempDots){
+            if(q.x < this.left) this.left = q.x;
+            if(q.x > this.right) this.right = q.x;
+        }
+
+        this.force = 200;
+        this.maxSpeed = 7;
         this.minSpeed = .1;
         this.stayAwaydist = size/8;
         this.additiveDist = 0;
@@ -23,10 +35,10 @@ class Text {
             d.show();
             // push();
             // fill(0);
-            // ellipse(this.right, this.down, 5);
-            // ellipse(this.right, this.up, 5);
-            // ellipse(this.left, this.down, 5);
-            // ellipse(this.left, this.up, 5);
+            //  ellipse(this.right, this.down, 5);
+            //  ellipse(this.right, this.up, 5);
+            //  ellipse(this.left, this.down, 5);
+            //  ellipse(this.left, this.up, 5);
             // pop();
         }
     }
@@ -44,11 +56,18 @@ class Text {
             //     d.resolveCollision(q);
             // }
         }
+        //this.stayAwaydist = size/8;
     }
 
     clicked(){
         if(this.inArea()){
             this.clickFunction();
+        }
+    }
+
+    pressed(){
+        if(this.inArea()){
+            this.pressedFunction();
         }
     }
 
@@ -60,6 +79,13 @@ class Text {
 
     clickFunction(){
         //runFromMouse();
+    }
+
+    pressedFunction(){
+        for(let d of this.dots){            
+            d.runFromTarget(this.force*2, this.stayAwaydist*4, mouse);
+            d.stayAwayFromTarget(this.stayAwaydist*2, mouse);
+        }
     }
 }
 

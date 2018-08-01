@@ -2,6 +2,7 @@ class Projectile extends Particle{
     constructor (pos, vel = createVector(0, 0), tank) {
         super(pos, vel);
         this.game = tank.game;
+        this.tank = tank;
         this.rad = tank.projectileRadius;
         this.color = tank.parentPlayer.color;
         this.mass = tank.projectileMass

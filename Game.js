@@ -152,8 +152,8 @@ class Game{
     newRoundMenu(colorOfWinner){
         texts.push(new Text("  Winner!", width/2, height*0.3, height*0.15, colorOfWinner));
         texts.push(new Text("New round?", width*0.5, height*0.6));
-        texts.push(new Play("Yes", width*0.4, height*0.73, height*0.08));
-        texts.push(new HomeMenu("No", width*0.6, height*0.73, height*0.08));
+        texts.push(new Play("Yes", width*0.4, height*0.75, height*0.10));
+        texts.push(new HomeMenu("No", width*0.6, height*0.75, height*0.10));
     
     }
 

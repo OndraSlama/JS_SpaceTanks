@@ -35,6 +35,7 @@ class Tank {
         this.ruins = [];
 
         // Projectile parameters
+        this.projectileType = 3;
         this.projectileDamage = 20;
         this.projectileExplosionRadius = this.tankSize;
         this.projectileLife = 5;
@@ -147,9 +148,22 @@ class Tank {
         this.barrelPos = p5.Vector.add(p5.Vector.add(this.pos, relativeMiddleVector), relativeBarrelVector);
     }
 
-    shoot(){        
-        let shot = p5.Vector.fromAngle(radians(this.absoluteAngle), this.shotPower);
-        this.projectiles.push(new Projectile(this.barrelPos, shot, this));
+    shoot(power = this.shotPower, type = this.projectileType){        
+        let shot = p5.Vector.fromAngle(radians(this.absoluteAngle), power);
+        switch (type) {
+            case 1:
+                this.projectiles.push(new Projectile(this.barrelPos, shot, this));
+                break;
+            case 2:
+                this.projectiles.push(new ShatterProjectile(this.barrelPos, shot, this));
+                break;
+            case 3:
+                this.projectiles.push(new TripleProjectile(this.barrelPos, shot, this));
+                break;
+            
+            default:
+                break;
+        }
     }
 
     updateProjectiles(other){

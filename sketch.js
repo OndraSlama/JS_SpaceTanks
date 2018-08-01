@@ -1,6 +1,6 @@
 // @ts-nocheck
-let canvasHeight = 800;
-let canvasWidth = 600;
+let canvasHeight = 600;
+let canvasWidth = 400;
 let redPlayerControls = [];
 let bluePlayerControld = [];
 let font;
@@ -39,7 +39,7 @@ let projectileMass = 10;
 let planetRadius = canvasHeight/16;
 let planetMass;
 let maxPlanets = 10;
-let gameSpeed = 3; // min == 1; max == 10 000x faster (-> 24 fps)
+let gameSpeed = 1; // min == 1; max == 10 000x faster (-> 24 fps)
 
 // Behaviors
 let G = 0.03;
