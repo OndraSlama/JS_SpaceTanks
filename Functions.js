@@ -14,8 +14,12 @@ function homeMenu(){
     endGameSesions();
     texts.push(new Text('SpaceTanks', width/2, height*0.2, canvasHeight*0.15));
 
-    texts.push(new Play("Quck play", width/2, height * 0.5))
+    texts.push(new Play("Quick play", width/2, height * 0.5))
     texts.push(new Settings("Advanced Settings", width/2, height * 0.75))
+}
+
+function playNewRound(game){
+    game.newRound();
 }
 
 function clearMenu(){
@@ -35,7 +39,7 @@ function endGameSesions(){
 function runFromMouse(){
     for (let t of texts){
         // t.force = 400;
-        t.additiveDist = 20;
+        t.additiveDist = 8;
     }
 }
 

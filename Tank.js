@@ -1,28 +1,28 @@
 class Tank {
-    constructor(a, p, game){        
+    constructor(a, p, player, game){        
         
         this.game = game;
 
         // Tank parameters
         this.planet = p;
         this.invMass = 0;        
-        this.tankSize = width*0.025;
+        this.maxHp = player.maxHp ;
+        this.hp = player.maxHp;
+        this.tankSize = player.tankSize * 0.005 * (100 + this.maxHp);
         this.barrelLength = this.tankSize/1.15;
         this.barrelWidth = this.barrelLength/4;      
         this.hitBoxRadius = this.tankSize*0.7;
-        this.shotPower = 0;
-        this.maxShotPower = 10;
-        this.maxHp = 100;
-        this.hp = this.maxHp;
+        this.maxShotPower = player.maxShotPower;
         
         // State variables
         this.pos = createVector();
         this.vel = createVector();
         this.barrelPos = createVector();
         this.rad = this.hitBoxRadius;
+        this.shotPower = 0;
         this.relativeAngle = random(0, 360);
         this.relativeVel = 1;
-        this.barrelAngle = 45;
+        this.barrelAngle = 0;
         this.barrelVel = 1;
         this.absoluteAngle = 0;
 
@@ -30,17 +30,17 @@ class Tank {
         this.exploded = 0;
 
         // Objects
-        this.parentPlayer;
+        this.parentPlayer = player;
         this.projectiles = [];
         this.ruins = [];
 
         // Projectile parameters
-        this.projectileType = 3;
-        this.projectileDamage = 20;
-        this.projectileExplosionRadius = this.tankSize;
-        this.projectileLife = 5;
-        this.projectileRadius = this.tankSize*0.15;
-        this.projectileMass = 8;  
+        this.projectileType = player.projectileType;
+        this.projectileDamage = player.projectileDamage;
+        this.projectileExplosionRadius = player.projectileExplosionRadius;
+        this.projectileLife = player.projectileLife;
+        this.projectileRadius = player.projectileRadius;
+        this.projectileMass = player.projectileMass;  
         
         // Trajectory
         this.trajectoryLength = 15;
@@ -48,7 +48,7 @@ class Tank {
     }
 
     show(){
-        let tankWidth = this.tankSize;
+        let tankWidth = this.tankSize * 1.5;
         let tankHeight = this.tankSize/2;
 
         //             //           
@@ -91,21 +91,21 @@ class Tank {
         stroke("black");
         strokeWeight(this.tankSize/10);
         rotate(-this.barrelAngle); // rotate back to tank Angle
-        ellipse(0, 0, tankHeight, tankWidth* 2/3); // draw cokpit
+        ellipse(0, 0, tankHeight, tankWidth* 0.5); // draw cokpit
 
         translate(-tankHeight, 0); // translate back to point 1
         rectMode(CORNER);
-        ellipse(tankHeight/2, tankWidth/2, tankHeight); // draw rounded ends of the body
-        ellipse(tankHeight/2, -tankWidth/2, tankHeight); 
-        rect(0, -tankWidth/2, tankHeight, tankWidth); // draw body of the tank
+        //ellipse(tankHeight/2, tankWidth/2, tankHeight); // draw rounded ends of the body
+        //ellipse(tankHeight/2, -tankWidth/2, tankHeight); 
+        rect(0, -tankWidth/2, tankHeight, tankWidth, tankHeight*0.6, tankHeight*0.6); // draw body of the tank
         noStroke();
-        ellipse(tankHeight/2, tankWidth/2, tankHeight - this.tankSize/12, tankHeight/2); // for fixing odd look
-        ellipse(tankHeight/2, -tankWidth/2, tankHeight -this.tankSize/12, tankHeight/2);
+        //ellipse(tankHeight/2, tankWidth/2, tankHeight - this.tankSize/12, tankHeight/2); // for fixing odd look
+        //ellipse(tankHeight/2, -tankWidth/2, tankHeight -this.tankSize/12, tankHeight/2);
 
         // Draw power bar
-        let healthBarLength = map(this.hp, 0, this.maxHp, 0, this.tankSize * 1.2)       
+        let healthBarLength = map(this.hp, 0, this.maxHp, 0, tankWidth)       
         fill(this.parentPlayer.color);
-        rect(-tankHeight * 0.8, -tankWidth * 0.6, tankHeight * 0.5, healthBarLength);
+        rect(-tankHeight * 0.8, -tankWidth * 0.5, tankHeight * 0.5, healthBarLength);
         pop();     
         
         // Draw trajectory

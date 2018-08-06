@@ -9,8 +9,8 @@ class Projectile extends Particle{
         this.invMass = 1/this.mass;
         this.pathLength = 200;
         this.life = tank.projectileLife;
-        this.damageRad = tank.projectileDamage;
-        this.maxDamage = tank.projectileExplosionRadius;
+        this.damageRad = tank.projectileExplosionRadius;
+        this.maxDamage = tank.projectileDamage;
     }   
     
     resolveHit(tank){
@@ -35,9 +35,9 @@ class Projectile extends Particle{
         noStroke();
         fill(this.color);
         for(let i = 0; i < this.history.length; i++){
-            let treshold = this.history.length - 10;
+            let treshold = this.history.length - 20;
             if (i > treshold){
-                ellipse(this.history[i].x, this.history[i].y, 2 * this.rad*(i - treshold)/10);
+                ellipse(this.history[i].x, this.history[i].y, 2 * this.rad*(i - treshold)/20);
             }else if(i % 6 == 0){
                 ellipse(this.history[i].x, this.history[i].y, 2 * this.rad/3);
             }

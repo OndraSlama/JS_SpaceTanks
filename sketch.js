@@ -19,7 +19,7 @@ function setup() {
     // p5 settings
     angleMode(DEGREES);
     frameRate(300);
-    textAlign(CENTER, CENTER);
+    //textAlign(CENTER, CENTER);
     
     //Dynamic buttons
     homeMenu();
@@ -55,7 +55,7 @@ function draw() {
     fill (255, 0, 0);
 
     if (texts.length > 0){
-        background(150);
+        background("grey");
     }     
 
     for(let g of games){
@@ -63,7 +63,7 @@ function draw() {
             g.play();
             g.resolveGame();
         }        
-        background(150);
+        background("grey");
         g.show();   
     }
 

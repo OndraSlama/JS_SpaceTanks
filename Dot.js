@@ -32,7 +32,7 @@ class Dot extends Particle {
         this.applyForce(steer);
     }
     
-    runFromTarget(force, dist, target){ //target = this.target){
+    runFromTarget(force, dist, target = this.target){ //target = this.target){
         let maxSpeed = force/20;
         let maxForce = force;
         let desired = p5.Vector.sub(target, this.pos);
@@ -50,23 +50,25 @@ class Dot extends Particle {
         this.applyForce(steer);
     }
 
-    stayAwayFromTarget(dist, target){
-        let d = this.pos.dist(target);
-        let maxDistanceToOverlap = this.rad + dist;
+    stayAwayFromTarget(dist, target = this.target) {
+        if (dist != 0) {
+            let d = this.pos.dist(target);
+            let maxDistanceToOverlap = this.rad + dist;
 
-        if ((d < maxDistanceToOverlap) && (d != 0)){           
+            if ((d < maxDistanceToOverlap) && (d != 0)) {
 
-            let normal = p5.Vector.sub(target, this.pos);
-            normal.normalize();            
-            
-            // Position corection            
-            let percent = 0.7; // usually 20% to 80%
-            let slop = 0.02; // usually 0.01 to 0.1
-            let penetration = maxDistanceToOverlap - d;
-            let correctionMag = max(penetration - slop*maxDistanceToOverlap, 0) / (this.invMass) * percent;
-            let correction = p5.Vector.mult(normal, correctionMag);
+                let normal = p5.Vector.sub(target, this.pos);
+                normal.normalize();
 
-            this.pos.sub(p5.Vector.mult(correction, this.invMass));
+                // Position corection            
+                let percent = 0.7; // usually 20% to 80%
+                let slop = 0.02; // usually 0.01 to 0.1
+                let penetration = maxDistanceToOverlap - d;
+                let correctionMag = max(penetration - slop * maxDistanceToOverlap, 0) / (this.invMass) * percent;
+                let correction = p5.Vector.mult(normal, correctionMag);
+
+                this.pos.sub(p5.Vector.mult(correction, this.invMass));
+            }
         }
     }
 

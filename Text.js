@@ -26,8 +26,11 @@ class Text {
         this.force = 200;
         this.maxSpeed = 7;
         this.minSpeed = .1;
-        this.stayAwaydist = size/8;
+        this.stayAwaydist = 0;
+        this.forceDist = size/4
         this.additiveDist = 0;
+        this.interactive = 0;
+        this.active = 0;
     }
 
     show(){
@@ -45,13 +48,15 @@ class Text {
 
     update(){
         this.stayAwaydist += this.additiveDist;
-        this.inArea() ? this.minSpeed = .6 : this.minSpeed = .1;
+        this.inArea() && this.interactive ? this.minSpeed = .3 : this.minSpeed = .1;
+        if (this.active) this.minSpeed = .6;
         for(let d of this.dots){
             d.move();
             //d.wrap();
             d.seekTarget(this.force, this.maxSpeed, this.minSpeed);
-            d.runFromTarget(this.force, this.stayAwaydist*2, mouse);
-            d.stayAwayFromTarget(this.stayAwaydist, mouse);            
+            d.runFromTarget(this.force, this.forceDist, mouse);
+            d.stayAwayFromTarget(this.forceDist / 2, mouse);  
+            d.stayAwayFromTarget(this.stayAwaydist);            
             // for(let q of this.dots){                
             //     d.resolveCollision(q);
             // }
@@ -83,8 +88,8 @@ class Text {
 
     pressedFunction(){
         for(let d of this.dots){            
-            d.runFromTarget(this.force*2, this.stayAwaydist*4, mouse);
-            d.stayAwayFromTarget(this.stayAwaydist*2, mouse);
+            d.runFromTarget(this.force*5, this.forceDist*2, mouse);
+            d.stayAwayFromTarget(this.forceDist, mouse);
         }
     }
 }
@@ -92,7 +97,8 @@ class Text {
 class Play extends Text {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
-      }
+        this.interactive = 1;  
+    }
       
       clickFunction(){
           runFromMouse();          
@@ -105,6 +111,7 @@ class Mode extends Text {
     constructor(string, x, y, size, color, diameter, val) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.value = val;
+        this.interactive = 1;
     }
       
       clickFunction(){
@@ -117,6 +124,7 @@ class Mode extends Text {
 class Settings extends Text {
     constructor(string, x, y, size, color, diameter, val) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
+        this.interactive = 1;
     }
       
       clickFunction(){
@@ -129,6 +137,7 @@ class Settings extends Text {
 class HomeMenu extends Text {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
+        this.interactive = 1;
       }
       
       clickFunction(){
@@ -138,6 +147,63 @@ class HomeMenu extends Text {
     
 }
 
+class NewRound extends Text {
+    constructor(game, string, x, y, size, color, diameter) {
+        super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
+        this.game = game;
+        this.interactive = 1;
+      }
+      
+      clickFunction(){
+          runFromMouse();          
+          setTimeout(playNewRound, 500, this.game);
+      }
+    
+}
+
+class ShopItem extends Text {
+    constructor(player, string, x, y, size, color, diameter, target, val, cost) {
+        super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
+        this.player = player;
+        this.value = val;
+        this.target = target;
+        this.cost = cost;
+        this.interactive = 1;        
+    }
+      
+    clickFunction() {
+        switch (this.target) {
+            case 1:
+                this.player.maxHp += this.value;
+                break;
+
+            case 2:
+                this.player.maxShotPower += this.value;
+                break;
+
+            case 3:
+                this.player.projectileDamage += this.value;
+                break;
+
+            case 4:
+                this.player.projectileExplosionRadius += this.value;
+                break;
+
+            case 5:
+                this.player.projectileType = this.value;
+                for(let t of texts){
+                    t.active = 0;
+                }
+                this.active = 1;
+                break;
+
+            default:
+                break;            
+        }
+        this.player.money -= this.cost;
+    }
+
+}
 
 
 
