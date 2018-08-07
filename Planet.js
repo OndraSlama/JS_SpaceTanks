@@ -7,12 +7,13 @@ class Planet {
         this.rad = r;        
         this.mass = m;    
         this.invMass = 0;
-        this.color = 100;
+        this.color = color(20, 20, 50);
         this.life = 0;
     }
 
     show() {        
-        fill(this.color);        
+        fill(this.color);
+        noStroke()        
         ellipse(this.pos.x, this.pos.y, this.rad * 2);      
     }
 

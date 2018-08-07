@@ -12,7 +12,7 @@ function settingsMenu(){
 function homeMenu(){
     clearMenu();
     endGameSesions();
-    texts.push(new Text('SpaceTanks', width/2, height*0.2, canvasHeight*0.15));
+    texts.push(new Text('SpaceTanks', width/2, height*0.2, canvasHeight*0.2,"white"));
 
     texts.push(new Play("Quick play", width/2, height * 0.5))
     texts.push(new Settings("Advanced Settings", width/2, height * 0.75))
@@ -36,10 +36,10 @@ function endGameSesions(){
     games.splice(0, games.length);
 }
 
-function runFromMouse(){
+function clearAnimation(){
     for (let t of texts){
         // t.force = 400;
-        t.additiveDist = 8;
+        t.additiveDist = 15;
     }
 }
 
@@ -59,6 +59,10 @@ function mouseClicked(){
     for(let t of texts){
         t.clicked();
     }
+}
+
+function windowResized(){
+    canvas1.height
 }
 
 function createPlanets(){

@@ -1,45 +1,25 @@
-// @ts-nocheck
-let canvasHeight = 600;
-let canvasWidth = 400;
-let redPlayerControls = [];
-let bluePlayerControld = [];
+// Global / p5 js specific variables
+let canvasWidth;
+let canvasHeight;
+let backgroundColor;
 let font;
-let texts = [];
 let mouse;
 
-function preload(){
-    font = loadFont('segoeuil.ttf');
-}
-
-function setup() {
-    // Create canvas
-    canvas1 = createCanvas(canvasHeight, canvasWidth);
-    mouse = createVector(mouseX, mouseY);
-
-    // p5 settings
-    angleMode(DEGREES);
-    frameRate(300);
-    //textAlign(CENTER, CENTER);
-    
-    //Dynamic buttons
-    homeMenu();
-    // Game settings
-    redPlayerControls = [87, 83, 68, 65, 32];
-    bluePlayerControls = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];
-
-
-}
+// Controls
+let redPlayerControls = [];
+let bluePlayerControld = [];
 
 // Arrays
 let games = [];
+let texts = [];
 
 // Parameters
 let projectileRadius = 10;
 let projectileMass = 10;
-let planetRadius = canvasHeight/16;
+let planetRadius;
 let planetMass;
 let maxPlanets = 10;
-let gameSpeed = 1; // min == 1; max == 10 000x faster (-> 24 fps)
+let gameSpeed = 5; // min == 1; max == 10 000x faster (-> 24 fps)
 
 // Behaviors
 let G = 0.03;
@@ -47,6 +27,38 @@ let bounceDamp = 0.9;
 let impulseDamp = 0.5;
 let airDamp = 0.05;
 
+function preload(){
+    font = loadFont('segoeuil.ttf');
+}
+
+function setup() {
+
+    // Create canvas
+    canvasWidth = windowWidth * 0.7;
+    canvasWidth = constrain(canvasWidth, 600, 900);
+    canvasHeight = canvasWidth * 3/5;
+    
+    canvas1 = createCanvas(canvasWidth, canvasHeight);
+    canvas1.parent('sketch-holder');    
+
+    // p5 settings
+    angleMode(DEGREES);
+    textFont(font);
+    textAlign(CENTER);
+    frameRate(300);
+    
+    //Dynamic buttons
+    homeMenu();
+
+    // Game settings
+    redPlayerControls = [87, 83, 68, 65, 32];
+    bluePlayerControls = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];     
+    backgroundColor = color(0, 0, 10);
+    planetRadius = height/8;
+    
+    // Others
+    mouse = createVector(mouseX, mouseY);
+}
 
 function draw() {
     
@@ -55,7 +67,7 @@ function draw() {
     fill (255, 0, 0);
 
     if (texts.length > 0){
-        background("grey");
+        background(backgroundColor);
     }     
 
     for(let g of games){
@@ -63,7 +75,7 @@ function draw() {
             g.play();
             g.resolveGame();
         }        
-        background("grey");
+        background(backgroundColor);
         g.show();   
     }
 

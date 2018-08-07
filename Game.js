@@ -26,7 +26,7 @@ class Game{
             // players.push(new Player('blue', bluePlayerControld));
         }else if(this.numberOfPlayers == 2){
             this.players.push(new Player('red', redPlayerControls));
-            this.players.push(new Player('black', bluePlayerControls));
+            this.players.push(new Player('green', bluePlayerControls));
         }
         this.shopMenu();
         // this.createPlanets();
@@ -49,15 +49,15 @@ class Game{
     createPlanets() {
         let q = 0;
         let temp;
-        let x = [0 + planetRadius * 2, width - planetRadius * 2];
-        let y = [0 + planetRadius * 2, height - planetRadius * 2];
-        let r = [planetRadius * 0.7, planetRadius * 1.3];
+        let x = [0 + planetRadius * 1.5, width - planetRadius * 1.5];
+        let y = [0 + planetRadius * 1.5, height - planetRadius * 1.5];
+        let r = [planetRadius * 0.4, planetRadius * 1.2];
 
         this.planets.splice(0, this.planets.length);     
 
         this.planets.push(new Planet(random(x[0], x[1]), random(y[0], y[1]), random(r[0], r[1])));
-        while (this.planets.length < 3) { // minimum of 3 planets        
-            if (q-- < -20) break; // in case there are still less then 3 planets after X tries
+        while (this.planets.length < 4) { // minimum of 4 planets        
+            if (q-- < -10000) break; // in case there are still less then 3 planets after X tries
             while (this.planets.length < maxPlanets && q < 100) { // will try to generate random planet until there are 6 of them or after 100 tries
                 temp = new Planet(random(x[0], x[1]), random(y[0], y[1]), random(r[0], r[1]));
                 if (temp.minDistanceToOthers(this.planets) > 3 * planetRadius) {
@@ -183,7 +183,7 @@ class Game{
                     setTimeout(this.endGameMenu, 1000, colorOfWinner, this);
                 } else {
                     setTimeout(this.endRoundMenu, 1000, colorOfWinner, this);
-                    setTimeout(runFromMouse, 5000);
+                    setTimeout(clearAnimation, 5000);
                     setTimeout(clearMenu, 6000);
                     setTimeout(this.clearTanksAndPlanets, 6000, this);
                     setTimeout(this.shopMenu, 6000, this);
@@ -218,7 +218,7 @@ class Game{
 
     shopMenu(game = this){
         game.additiveAlpha = -0.01;
-        texts.push(new Text("Shop", width/2, height*0.2, height*0.15, "gold"));
+        texts.push(new Text("Shop", width/2, height*0.1, height*0.15, "gold"));
         texts.push(new NewRound(game, "Play round", width/2, height*0.9, height*0.12));
         
         // Create interactive buttons
@@ -227,13 +227,14 @@ class Game{
         // 3 = projectile damage
         // 4 = explosion radius
         // 5 = projectile type
+        fill(255);
         texts.push(new ShopItem(game.players[0], "^", width*0.1, height*0.3, height*0.15, undefined, undefined, 1, 10, 600));
         texts.push(new ShopItem(game.players[0], "^", width*0.1, height*0.4, height*0.15, undefined, undefined, 2, 1, 700)); 
         texts.push(new ShopItem(game.players[0], "^", width*0.1, height*0.5, height*0.15, undefined, undefined, 3, 5, 500)); 
         texts.push(new ShopItem(game.players[0], "^", width*0.1, height*0.6, height*0.15, undefined, undefined, 4, 3, 550)); 
-        texts.push(new ShopItem(game.players[0], "Normal", width*0.2, height*0.7, height*0.11, undefined, undefined, 5, 1, 0)); 
+        texts.push(new ShopItem(game.players[0], "Normal", width*0.25, height*0.7, height*0.11, undefined, undefined, 5, 1, 0)); 
         texts.push(new ShopItem(game.players[0], "Shatter", width*0.5, height*0.7, height*0.11, undefined, undefined, 5, 2, 2983)); 
-        texts.push(new ShopItem(game.players[0], "Triple", width*0.8, height*0.7, height*0.11, undefined, undefined, 5, 3, 3333)); 
+        texts.push(new ShopItem(game.players[0], "Triple", width*0.75, height*0.7, height*0.11, undefined, undefined, 5, 3, 3333)); 
     }
 
     end(){

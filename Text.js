@@ -1,62 +1,74 @@
 class Text {
-    constructor(string, x, y, size = height * 0.11, color = "white", radius = size*0.04){
-        this.dots = [];
-        let tempDots = font.textToPoints(string, x-size*string.length*0.25, y + size*0.2, size, {
-            sampleFactor: .15,
+    constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.04) {
+
+        this.textSampleFactor = 0.15;
+        let tempBounds = font.textBounds(string, x, y, size);
+
+        let tempDots = font.textToPoints(string, x - tempBounds.w / 2, y + tempBounds.h / 2, size, {
+            sampleFactor: this.textSampleFactor,
             simplifyThreshold: 0
-          });
+        });
+
+        let bounds = font.textBounds(string, x, y + tempBounds.h / 2, size);
 
         // Create particles
-        for(let q of tempDots){
-            let pos = createVector(q.x, q.y)
-            let vel = createVector(0, 0);
-            this.dots.push(new Dot(pos, radius, color));
+        this.dots = [];
+        let spawnPos = createVector(x, y);
+        for (let q of tempDots) {
+            let pos = createVector(q.x, q.y);
+            this.dots.push(new Dot(pos, radius, color, spawnPos));
         }
+
+        // Save parameters
+        this.string = string;
+        this.x = x;
+        this.y = y;
+        this.size = size;
+        this.color = color;
+        this.dotRadius = radius;
 
         // Determine hitbox
-        this.left = this.dots[0].target.x;
-        this.right = this.dots[this.dots.length-1].target.x;
-        this.down = y + size*0.2;
-        this.up = this.down - size*0.7;        
-        for(let q of tempDots){
-            if(q.x < this.left) this.left = q.x;
-            if(q.x > this.right) this.right = q.x;
-        }
+        this.left = bounds.x;
+        this.right = bounds.x + bounds.w;
+        this.down = bounds.y + bounds.h;
+        this.up = bounds.y;
 
+        // Others
         this.force = 200;
-        this.maxSpeed = 7;
+        this.maxSpeed = 15;
         this.minSpeed = .1;
         this.stayAwaydist = 0;
-        this.forceDist = size/4
+        this.forceDist = size / 4
         this.additiveDist = 0;
         this.interactive = 0;
         this.active = 0;
     }
 
-    show(){
-        for(let d of this.dots){
+    show() {
+        for (let d of this.dots) {
             d.show();
-            // push();
-            // fill(0);
-            //  ellipse(this.right, this.down, 5);
-            //  ellipse(this.right, this.up, 5);
-            //  ellipse(this.left, this.down, 5);
-            //  ellipse(this.left, this.up, 5);
-            // pop();
         }
+        // ellipse(this.right, this.down, 5);
+        // ellipse(this.right, this.up, 5);
+        // ellipse(this.left, this.down, 5);
+        // ellipse(this.left, this.up, 5);
     }
 
-    update(){
+    update() {
         this.stayAwaydist += this.additiveDist;
-        this.inArea() && this.interactive ? this.minSpeed = .3 : this.minSpeed = .1;
-        if (this.active) this.minSpeed = .6;
-        for(let d of this.dots){
+        if (this.interactive) {
+            this.inArea() ? this.minSpeed = .3 : this.minSpeed = .1;
+            if (this.active) this.minSpeed = .6;
+        }else{
+            this.minSpeed = 0;
+        }
+        for (let d of this.dots) {
             d.move();
             //d.wrap();
             d.seekTarget(this.force, this.maxSpeed, this.minSpeed);
             d.runFromTarget(this.force, this.forceDist, mouse);
-            d.stayAwayFromTarget(this.forceDist / 2, mouse);  
-            d.stayAwayFromTarget(this.stayAwaydist);            
+            d.stayAwayFromTarget(this.forceDist / 2, mouse);
+            d.stayAwayFromTarget(this.stayAwaydist);
             // for(let q of this.dots){                
             //     d.resolveCollision(q);
             // }
@@ -64,31 +76,59 @@ class Text {
         //this.stayAwaydist = size/8;
     }
 
-    clicked(){
-        if(this.inArea()){
+    changeText(newString) {
+        let tempBounds = font.textBounds(newString, this.x, this.y, this.size);
+
+        let tempDots = font.textToPoints(newString, this.x - tempBounds.w / 2, this.y + tempBounds.h / 2, this.size, {
+            sampleFactor: this.textSampleFactor,
+            simplifyThreshold: 0
+        });
+
+        let bounds = font.textBounds(newString, this.x - tempBounds.w / 2, this.y + tempBounds.h / 2, this.size);
+
+        let diff = tempDots.length - this.dots.length;
+
+        if(diff > 0){
+            for(let i = 0; i < diff; i++){
+                let pos = createVector(this.x, this.y);
+                this.dots.push(new Dot(pos, this.dotRadius, this.color, pos));
+            }
+        }else{
+            this.dots.splice(this.dots.length - (abs(diff)), abs(diff))
+        }
+
+        // Change targets of dots
+        for (let i = 0; i < tempDots.length; i++) {
+            let pos = createVector(tempDots[i].x, tempDots[i].y)
+            this.dots[i].target = pos.copy();
+        }
+    }
+
+    clicked() {
+        if (this.inArea()) {
             this.clickFunction();
         }
     }
 
-    pressed(){
-        if(this.inArea()){
+    pressed() {
+        if (this.inArea()) {
             this.pressedFunction();
         }
     }
 
-    inArea(){
-        if(mouseX < this.left || mouseX > this.right) return false;
-        if(mouseY < this.up || mouseY > this.down) return false;
+    inArea() {
+        if (mouseX < this.left || mouseX > this.right) return false;
+        if (mouseY < this.up || mouseY > this.down) return false;
         return true;
     }
 
-    clickFunction(){
+    clickFunction() {
         //runFromMouse();
     }
 
-    pressedFunction(){
-        for(let d of this.dots){            
-            d.runFromTarget(this.force*5, this.forceDist*2, mouse);
+    pressedFunction() {
+        for (let d of this.dots) {
+            d.runFromTarget(this.force * 5, this.forceDist * 2, mouse);
             d.stayAwayFromTarget(this.forceDist, mouse);
         }
     }
@@ -97,14 +137,14 @@ class Text {
 class Play extends Text {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
-        this.interactive = 1;  
+        this.interactive = 1;
     }
-      
-      clickFunction(){
-          runFromMouse();          
-          setTimeout(createGameSesion, 1000, 2);
-      }
-    
+
+    clickFunction() {
+        clearAnimation();
+        setTimeout(createGameSesion, 1000, 2);
+    }
+
 }
 
 class Mode extends Text {
@@ -113,12 +153,12 @@ class Mode extends Text {
         this.value = val;
         this.interactive = 1;
     }
-      
-      clickFunction(){
-          runFromMouse();
-          setTimeout(createGameSesion, 1000, this.value);
-      }
-    
+
+    clickFunction() {
+        clearAnimation();
+        setTimeout(createGameSesion, 1000, this.value);
+    }
+
 }
 
 class Settings extends Text {
@@ -126,25 +166,25 @@ class Settings extends Text {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.interactive = 1;
     }
-      
-      clickFunction(){
-          runFromMouse();
-          setTimeout(settingsMenu, 1000);
-      }
-    
+
+    clickFunction() {
+        clearAnimation();
+        setTimeout(settingsMenu, 1000);
+    }
+
 }
 
 class HomeMenu extends Text {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.interactive = 1;
-      }
-      
-      clickFunction(){
-          runFromMouse();          
-          setTimeout(homeMenu, 1000);
-      }
-    
+    }
+
+    clickFunction() {
+        clearAnimation();
+        setTimeout(homeMenu, 1000);
+    }
+
 }
 
 class NewRound extends Text {
@@ -152,13 +192,13 @@ class NewRound extends Text {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.game = game;
         this.interactive = 1;
-      }
-      
-      clickFunction(){
-          runFromMouse();          
-          setTimeout(playNewRound, 500, this.game);
-      }
-    
+    }
+
+    clickFunction() {
+        clearAnimation();
+        setTimeout(playNewRound, 500, this.game);
+    }
+
 }
 
 class ShopItem extends Text {
@@ -168,9 +208,9 @@ class ShopItem extends Text {
         this.value = val;
         this.target = target;
         this.cost = cost;
-        this.interactive = 1;        
+        this.interactive = 1;
     }
-      
+
     clickFunction() {
         switch (this.target) {
             case 1:
@@ -191,14 +231,14 @@ class ShopItem extends Text {
 
             case 5:
                 this.player.projectileType = this.value;
-                for(let t of texts){
+                for (let t of texts) {
                     t.active = 0;
                 }
                 this.active = 1;
                 break;
 
             default:
-                break;            
+                break;
         }
         this.player.money -= this.cost;
     }

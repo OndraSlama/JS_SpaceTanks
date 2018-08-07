@@ -1,12 +1,16 @@
 class Dot extends Particle {
-    constructor(pos, r = 8, c = "white"){
+    constructor(pos, r = 8, c = "white", spawnPos = undefined){
         super(pos);
         this.rad = r;
         this.color = c;
-        this.target = pos.copy();        
-        let tempX = (width/2 - sign(random(-1,1)) * random(width/2, width));            
-        let tempY = (height/2 + sign(random(-1,1)) * random(height/2, height));
-        this.pos = createVector(tempX, tempY);             
+        this.target = pos.copy(); 
+        if(spawnPos == undefined){       
+            let tempX = (width/2 - sign(random(-1,1)) * random(width/2, width));            
+            let tempY = (height/2 + sign(random(-1,1)) * random(height/2, height));
+            this.pos = createVector(tempX, tempY);  
+        }else{
+            this.pos = spawnPos.copy();  
+        }           
     }
 
     show() {       
@@ -50,7 +54,9 @@ class Dot extends Particle {
         this.applyForce(steer);
     }
 
-    stayAwayFromTarget(dist, target = this.target) {
+    stayAwayFromTarget(dist, target = this.target.copy()) {
+        target.x += random(-.1, .1);
+        target.y += random(-.1, .1);
         if (dist != 0) {
             let d = this.pos.dist(target);
             let maxDistanceToOverlap = this.rad + dist;

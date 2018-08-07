@@ -16,13 +16,13 @@ class Player{
         // Tank parameters
         this.maxHp = 100;
         this.maxShotPower = 10;
-        this.tankSize = width*0.025;
+        this.tankSize = height*0.03;
 
          // Projectile parameters
          this.projectileDamage = 20;
-         this.projectileExplosionRadius = width*0.025;
+         this.projectileExplosionRadius = height*0.03;
          this.projectileLife = 5;
-         this.projectileRadius = width*0.025*0.15;
+         this.projectileRadius = height*0.03*0.15;
          this.projectileMass = 8;
          this.projectileType = 3;
     }

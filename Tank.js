@@ -9,8 +9,8 @@ class Tank {
         this.maxHp = player.maxHp ;
         this.hp = player.maxHp;
         this.tankSize = player.tankSize * 0.005 * (100 + this.maxHp);
-        this.barrelLength = this.tankSize/1.15;
-        this.barrelWidth = this.barrelLength/4;      
+        this.barrelLength = this.tankSize;
+        this.barrelWidth = this.barrelLength * 0.25;      
         this.hitBoxRadius = this.tankSize*0.7;
         this.maxShotPower = player.maxShotPower;
         
@@ -64,32 +64,35 @@ class Tank {
         push();
 
         // Draw tank
+        
         translate(this.planet.pos); // center of planet 
         rotate(this.relativeAngle); // rotate so that X axis is parallel with tankAngle
         translate(this.planet.rad, 0); // translate to the edge of planet where the tank sits (point 1)
         translate(tankHeight, 0); // translate to point 2
         rotate(this.barrelAngle); // rotate so the barrel is parallel with X axis
 
-        fill(this.parentPlayer.color);                
+        // Draw barrel
+        fill(this.parentPlayer.color);
         strokeWeight(this.barrelWidth);       
-        line(0, 0, this.barrelLength, 0); // draw barrel
-        
+        stroke(60);
+        line(0, 0, this.barrelLength, 0); 
         rectMode(CENTER);
         rect(this.barrelLength, 0, this.barrelWidth/3, this.barrelWidth/3);  // draw the tip of the barrel 
         
         // Draw power bar        
+        stroke(this.parentPlayer.color);
         let powerBarLength = map(this.shotPower, 0.1, this.maxShotPower, tankHeight*0.4, this.barrelLength + this.barrelWidth/3)
         if (powerBarLength < 0) powerBarLength = 0;        
-        stroke(this.parentPlayer.color);
         line(0, 0, powerBarLength, 0); // draw barrel
-
+        
         let tipOfBarrelLength = powerBarLength - (this.barrelLength - this.barrelWidth/3);
         if (tipOfBarrelLength < 0) tipOfBarrelLength = 0;
         rectMode(CORNER);   
         rect(-this.barrelWidth/3, -this.barrelWidth/3, tipOfBarrelLength, this.barrelWidth/3);
 
-        stroke("black");
-        strokeWeight(this.tankSize/10);
+        // stroke("black");
+        noStroke();
+        // strokeWeight(this.tankSize/10);
         rotate(-this.barrelAngle); // rotate back to tank Angle
         ellipse(0, 0, tankHeight, tankWidth* 0.5); // draw cokpit
 
