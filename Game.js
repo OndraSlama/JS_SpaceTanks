@@ -182,12 +182,7 @@ class Game{
                 if (this.endOfGame()) {
                     setTimeout(this.endGameMenu, 1000, colorOfWinner, this);
                 } else {
-                    setTimeout(this.endRoundMenu, 1000, colorOfWinner, this);
-                    setTimeout(clearAnimation, 5000);
-                    setTimeout(clearMenu, 6000);
-                    setTimeout(this.clearTanksAndPlanets, 6000, this);
-                    setTimeout(this.shopMenu, 6000, this);
-
+                    setTimeout(this.endRoundMenu, 1000, colorOfWinner, this); 
                 }
             }
         }
@@ -210,10 +205,20 @@ class Game{
         game.additiveAlpha = 0.001;
     }
 
-    endRoundMenu(colorOfWinner, game){
+    endRoundMenu(colorOfWinner, game = this){
         texts.push(new Text("Winner!", width/2, height/2, height*0.20, colorOfWinner));   
         game.colorOfWinnerMenu = color(colorOfWinner);
-        game.additiveAlpha = 0.003;     
+        game.additiveAlpha = 0.003;
+
+        setTimeout(clearAnimation, 4000);
+        setTimeout(function(){
+            clearMenu();
+            game.clearTanksAndPlanets();
+            game.shopMenu();
+        }, 5000)
+        // setTimeout(clearMenu, 5000);
+        // setTimeout(game.clearTanksAndPlanets, 6000, game);
+        // setTimeout(game.shopMenu, 5000, game);
     }
 
     shopMenu(game = this){

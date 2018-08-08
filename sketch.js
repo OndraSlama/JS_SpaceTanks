@@ -53,7 +53,7 @@ function setup() {
     // Game settings
     redPlayerControls = [87, 83, 68, 65, 32];
     bluePlayerControls = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];     
-    backgroundColor = color(0, 0, 10);
+    backgroundColor = color(0, 0, 20);
     planetRadius = height/8;
     
     // Others

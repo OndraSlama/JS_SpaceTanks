@@ -19,14 +19,25 @@ function homeMenu(){
 }
 
 function playNewRound(game){
-    game.newRound();
+    texts.push(new Text("New Round in: 3", width/2, height/2, height*0.20))
+    setTimeout(function() {
+        texts[texts.length - 1].changeText("New Round in: 2");
+    }, 1000);
+    setTimeout(function() {
+        texts[texts.length - 1].changeText("New Round in: 1");
+    }, 2000);
+    setTimeout(function(){
+        clearAnimation();
+        game.newRound();
+    }, 3000);    
+    
 }
 
 function clearMenu(){
     for (let t of texts){
         t.dots.splice(0, t.dots.length);
     }
-    texts.splice(0, text.length);
+    texts.splice(0, texts.length);
 }
 
 function endGameSesions(){
