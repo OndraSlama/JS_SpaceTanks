@@ -1,5 +1,5 @@
 class Text {
-    constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.04) {
+    constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.05) {
 
         this.textSampleFactor = 0.15;
         let tempBounds = font.textBounds(string, x, y, size);
@@ -66,8 +66,10 @@ class Text {
             d.move();
             //d.wrap();
             d.seekTarget(this.force, this.maxSpeed, this.minSpeed);
-            d.runFromTarget(this.force, this.forceDist, mouse);
-            d.stayAwayFromTarget(this.forceDist / 2, mouse);
+            if(!this.interactive) d.runFromTarget(this.force/3, this.forceDist/2, mouse);
+
+            if(this.inArea() && this.interactive) d.seekTarget(this.force, this.maxSpeed/2, this.minSpeed, mouse);
+            // d.stayAwayFromTarget(this.forceDist / 2, mouse);
             d.stayAwayFromTarget(this.stayAwaydist);
             // for(let q of this.dots){                
             //     d.resolveCollision(q);
