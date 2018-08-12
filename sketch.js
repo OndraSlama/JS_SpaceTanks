@@ -4,6 +4,7 @@ let canvasHeight;
 let backgroundColor;
 let font;
 let mouse;
+let textAnimationSpeed = 1000;
 
 // Controls
 let redPlayerControls = [];
@@ -27,6 +28,9 @@ let bounceDamp = 0.9;
 let impulseDamp = 0.5;
 let airDamp = 0.05;
 
+// Debug
+let noMenu = 1;
+
 function preload(){
     font = loadFont('segoeuil.ttf');
 }
@@ -47,22 +51,30 @@ function setup() {
     textAlign(CENTER);
     frameRate(300);
     
-    //Dynamic buttons
-    homeMenu();
-
     // Game settings
     redPlayerControls = [87, 83, 68, 65, 32];
     bluePlayerControls = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];     
     backgroundColor = color(0, 0, 20);
     planetRadius = height/8;
-    
+
     // Others
-    mouse = createVector(mouseX, mouseY);
+    mouse = createVector(mouseX, mouseY);    
+    createP("Game speed");
+    gameSpeedSlider = createSlider(1, 10, 1, 1);
+    
+    //Dynamic menu
+    if(!noMenu){
+        homeMenu();
+    }else{
+        createGameSesion();
+    }
+    
 }
 
 function draw() {
     
     mouse.set(mouseX, mouseY); 
+    gameSpeed = gameSpeedSlider.value();
     
     fill (255, 0, 0);
 

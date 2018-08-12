@@ -44,5 +44,10 @@ class Projectile extends Particle{
         }
         pop();
     }    
+
+    resolveLife(other){
+       if(this.tank == other.tank) return
+       this.life--;
+    }
 }
 

@@ -4,32 +4,30 @@ function createGameSesion(numberOfPlayers){
 }
 
 function settingsMenu(){    
-    clearMenu();
     texts.push(new Mode('1 Player', width*0.28, height*0.5, 70, "red", 3, 1));
     texts.push(new Mode('2 Players', width*0.77, height*0.5, 70, "blue", 3, 2));
 }
 
 function homeMenu(){
-    clearMenu();
     endGameSesions();
-    texts.push(new Text('SpaceTanks', width/2, height*0.2, canvasHeight*0.2,"white"));
+    texts.push(new Text('SpaceTanks', width/2, height*0.2, height*0.2,"white"));
 
     texts.push(new Play("Quick play", width/2, height * 0.5))
     texts.push(new Settings("Advanced Settings", width/2, height * 0.75))
 }
 
 function playNewRound(game){
-    texts.push(new Text("New Round in: 3", width/2, height/2, height*0.20))
+    texts.push(new Text("New Round in: 3", width/2, height/2, height*0.20));
     setTimeout(function() {
         texts[texts.length - 1].changeText("New Round in: 2");
-    }, 1000);
+    }, textAnimationSpeed);
     setTimeout(function() {
         texts[texts.length - 1].changeText("New Round in: 1");
-    }, 2000);
+    }, textAnimationSpeed * 2);
     setTimeout(function(){
         clearAnimation();
         game.newRound();
-    }, 3000);    
+    }, textAnimationSpeed * 3);    
     
 }
 
@@ -50,8 +48,9 @@ function endGameSesions(){
 function clearAnimation(){
     for (let t of texts){
         // t.force = 400;
-        t.additiveDist = 15;
+        t.clearingAnimation = 1;
     }
+    setTimeout(clearMenu, textAnimationSpeed*0.9);
 }
 
 function mouseDragged(){

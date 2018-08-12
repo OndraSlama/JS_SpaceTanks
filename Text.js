@@ -1,7 +1,8 @@
 class Text {
     constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.05) {
 
-        this.textSampleFactor = 0.15;
+        this.textSampleFactor = 8/size;
+        if(this.textSampleFactor > 0.25) this.textSampleFactor = 0.25
         let tempBounds = font.textBounds(string, x, y, size);
 
         let tempDots = font.textToPoints(string, x - tempBounds.w / 2, y + tempBounds.h / 2, size, {
@@ -23,6 +24,7 @@ class Text {
         this.string = string;
         this.x = x;
         this.y = y;
+        this.pos = createVector(x, y);
         this.size = size;
         this.color = color;
         this.dotRadius = radius;
@@ -35,18 +37,22 @@ class Text {
 
         // Others
         this.force = 200;
-        this.maxSpeed = 15;
-        this.minSpeed = .1;
+        this.maxSpeed = 40;
+        this.minSpeed = .05;
         this.stayAwaydist = 0;
         this.forceDist = size / 4
         this.additiveDist = 0;
         this.interactive = 0;
         this.active = 0;
+        this.clearingAnimation = 0;
+        this.clickedFlag = 0;
     }
 
     show() {
         for (let d of this.dots) {
-            d.show();
+            if(d.pos.dist(this.pos) > 5 || !this.clearingAnimation){
+                d.show();
+            }
         }
         // ellipse(this.right, this.down, 5);
         // ellipse(this.right, this.up, 5);
@@ -57,23 +63,31 @@ class Text {
     update() {
         this.stayAwaydist += this.additiveDist;
         if (this.interactive) {
-            this.inArea() ? this.minSpeed = .3 : this.minSpeed = .1;
-            if (this.active) this.minSpeed = .6;
+            this.minSpeed = .03;            
         }else{
             this.minSpeed = 0;
         }
+        if (this.active) this.minSpeed = .25;
+        
         for (let d of this.dots) {
             d.move();
             //d.wrap();
-            d.seekTarget(this.force, this.maxSpeed, this.minSpeed);
-            if(!this.interactive) d.runFromTarget(this.force/3, this.forceDist/2, mouse);
+            if(!this.clearingAnimation){
 
-            if(this.inArea() && this.interactive) d.seekTarget(this.force, this.maxSpeed/2, this.minSpeed, mouse);
-            // d.stayAwayFromTarget(this.forceDist / 2, mouse);
-            d.stayAwayFromTarget(this.stayAwaydist);
-            // for(let q of this.dots){                
-            //     d.resolveCollision(q);
-            // }
+                d.seekTarget(this.force, this.maxSpeed, this.minSpeed);
+
+                if(!this.interactive) d.runFromTarget(this.force/3, this.forceDist, mouse);
+
+                if(this.inArea() && this.interactive) d.seekTarget(this.force, this.maxSpeed/2, this.minSpeed, mouse);
+
+                d.stayAwayFromTarget(this.forceDist / 4, mouse);
+                // for(let q of this.dots){                
+                //     d.resolveCollision(q);
+                // }
+            }else{   
+                this.additiveDist = 15;
+                this.clickedFlag ? d.stayAwayFromTarget(this.stayAwaydist, this.pos) : d.seekTarget(this.force, this.maxSpeed/2, 0, this.pos);
+            }
         }
         //this.stayAwaydist = size/8;
     }
@@ -107,7 +121,11 @@ class Text {
     }
 
     clicked() {
-        if (this.inArea()) {
+        if (this.inArea() && this.interactive) {
+            for(let t of texts){
+                t.clickedFlag = 0;
+            }
+            this.clickedFlag = 1;
             this.clickFunction();
         }
     }
@@ -144,7 +162,7 @@ class Play extends Text {
 
     clickFunction() {
         clearAnimation();
-        setTimeout(createGameSesion, 1000, 2);
+        setTimeout(createGameSesion, textAnimationSpeed, 2);
     }
 
 }
@@ -158,7 +176,7 @@ class Mode extends Text {
 
     clickFunction() {
         clearAnimation();
-        setTimeout(createGameSesion, 1000, this.value);
+        setTimeout(createGameSesion, textAnimationSpeed, this.value);
     }
 
 }
@@ -171,7 +189,7 @@ class Settings extends Text {
 
     clickFunction() {
         clearAnimation();
-        setTimeout(settingsMenu, 1000);
+        setTimeout(settingsMenu, textAnimationSpeed);
     }
 
 }
@@ -184,7 +202,7 @@ class HomeMenu extends Text {
 
     clickFunction() {
         clearAnimation();
-        setTimeout(homeMenu, 1000);
+        setTimeout(homeMenu, textAnimationSpeed);
     }
 
 }
@@ -198,9 +216,23 @@ class NewRound extends Text {
 
     clickFunction() {
         clearAnimation();
-        setTimeout(playNewRound, 500, this.game);
+        setTimeout(playNewRound, textAnimationSpeed, this.game);
     }
 
+}
+
+class NextPlayer extends Text {
+    constructor(game, string, x, y, size, color, diameter, value) {
+        super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
+        this.game = game;
+        this.value = value;
+        this.interactive = 1;
+    }
+
+    clickFunction() {
+        clearAnimation();
+        setTimeout(this.game.shopMenu, textAnimationSpeed, this.game, this.value + 1);
+    }
 }
 
 class ShopItem extends Text {
@@ -211,42 +243,49 @@ class ShopItem extends Text {
         this.target = target;
         this.cost = cost;
         this.interactive = 1;
+        if(val == player.projectileType && target == 5){
+            this.active = 1;
+        }
     }
 
     clickFunction() {
-        switch (this.target) {
-            case 1:
-                this.player.maxHp += this.value;
-                break;
+        if (this.cost <= this.player.money){
+            switch (this.target) {
+                case 1:
+                    this.player.maxHp += this.value;
+                    texts[texts.length - this.target - 1].changeText(this.player.maxHp + "");
+                    break;
 
-            case 2:
-                this.player.maxShotPower += this.value;
-                break;
+                case 2:
+                    this.player.maxShotPower += this.value;
+                    texts[texts.length - this.target - 1].changeText(this.player.maxShotPower + "");
+                    break;
 
-            case 3:
-                this.player.projectileDamage += this.value;
-                break;
+                case 3:
+                    this.player.projectileDamage += this.value;
+                    texts[texts.length - this.target - 1].changeText(this.player.projectileDamage + "");
+                    break;
 
-            case 4:
-                this.player.projectileExplosionRadius += this.value;
-                break;
+                case 4:
+                    this.player.projectileExplosionRadius += this.value;
+                    texts[texts.length - this.target - 1].changeText(round(this.player.projectileExplosionRadius) + "");
+                    break;
 
-            case 5:
-                this.player.projectileType = this.value;
-                for (let t of texts) {
-                    t.active = 0;
-                }
-                this.active = 1;
-                break;
+                case 5:
+                    this.player.projectileType = this.value;
+                    if (this.active) this.player.money += this.cost;
+                    for (let t of texts) {
+                        t.active = 0;
+                    }
+                    this.active = 1;
+                    break;
 
-            default:
-                break;
-        }
-        this.player.money -= this.cost;
+                default:
+                    break;
+            }
+           this.player.money -= this.cost;
+        }        
+        texts[texts.length - 1].changeText("Money: "+ this.player.money);
     }
 
 }
-
-
-
-

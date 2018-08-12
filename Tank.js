@@ -39,8 +39,8 @@ class Tank {
         this.projectileDamage = player.projectileDamage;
         this.projectileExplosionRadius = player.projectileExplosionRadius;
         this.projectileLife = player.projectileLife;
-        this.projectileRadius = player.projectileRadius;
-        this.projectileMass = player.projectileMass;  
+        this.projectileRadius = player.projectileRadius + 0.02*this.projectileExplosionRadius;
+        this.projectileMass = player.projectileMass + 0.02*this.projectileDamage;  
         
         // Trajectory
         this.trajectoryLength = 15;
@@ -151,7 +151,8 @@ class Tank {
         this.barrelPos = p5.Vector.add(p5.Vector.add(this.pos, relativeMiddleVector), relativeBarrelVector);
     }
 
-    shoot(power = this.shotPower, type = this.projectileType){        
+    shoot(power = this.shotPower, type = this.projectileType){    
+        this.updatePositions();    
         let shot = p5.Vector.fromAngle(radians(this.absoluteAngle), power);
         switch (type) {
             case 1:
@@ -162,6 +163,12 @@ class Tank {
                 break;
             case 3:
                 this.projectiles.push(new TripleProjectile(this.barrelPos, shot, this));
+                break;
+            case 4:
+                this.projectiles.push(new ShotgunProjectile(this.barrelPos, shot, this));
+                break;
+            case 5:
+                this.projectiles.push(new ChainProjectile(this.barrelPos, shot, this));
                 break;
             
             default:

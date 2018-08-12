@@ -2,7 +2,7 @@ class Player{
     constructor(c, controls){
         this.color = c;
         this.tank;
-        this.money = 0;
+        this.money = 3000;
         this.score = 0;
         this.lives = 5;
 
@@ -24,7 +24,7 @@ class Player{
          this.projectileLife = 5;
          this.projectileRadius = height*0.03*0.15;
          this.projectileMass = 8;
-         this.projectileType = 3;
+         this.projectileType = 2;
     }
 
     setTank(tank){

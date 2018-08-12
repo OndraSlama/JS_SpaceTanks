@@ -4,6 +4,7 @@ class Particle {
         this.vel = vel;
         this.acc = createVector(0, 0);
         this.force = createVector(0, 0);
+        this.forceHeading = 0;
         this.rad = 3;        
         this.mass = 5;    
         this.invMass = 1/this.mass;
@@ -42,6 +43,7 @@ class Particle {
         this.pos.add(this.vel);
         this.vel.add(this.acc);
         this.acc = p5.Vector.div(this.force, this.mass);
+        this.forceHeading = this.force.heading();
         this.force.set(0, 0);       
     }
 
@@ -144,7 +146,7 @@ class Particle {
             if ((d < maxDistanceToOverlap) && (d != 0)) {
 
                 // Sub one from lifecounter
-                this.life--;
+                this.resolveLife(other);
 
                 //------------ IMPACT --------------//     
 
@@ -184,7 +186,11 @@ class Particle {
                 this.pos.sub(p5.Vector.mult(correction, this.invMass));
                 other.pos.add(p5.Vector.mult(correction, other.invMass));
             }
-        }
+        }        
+    }
+
+    resolveLife(){
+        // Overwritten in projectile
     }
 }
 

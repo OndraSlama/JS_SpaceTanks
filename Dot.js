@@ -27,8 +27,8 @@ class Dot extends Particle {
         let desired = p5.Vector.sub(target, this.pos);
         let d = desired.mag();
         let vel = maxSpeed;
-        if (d < 100){
-             vel = map(d, 0, 100, minSpeed, maxSpeed);
+        if (d < 200){
+             vel = map(d, 0, 200, minSpeed, maxSpeed);
         }
         desired.setMag(vel);
         let steer = p5.Vector.sub(desired, this.vel);
