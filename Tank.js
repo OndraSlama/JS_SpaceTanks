@@ -9,6 +9,7 @@ class Tank {
         this.maxHp = player.maxHp ;
         this.hp = player.maxHp;
         this.tankSize = player.tankSize * 0.005 * (100 + this.maxHp);
+        this.tankSize = constrain(this.tankSize, 8, 25);
         this.barrelLength = this.tankSize;
         this.barrelWidth = this.barrelLength * 0.25;      
         this.hitBoxRadius = this.tankSize*0.7;
@@ -176,22 +177,36 @@ class Tank {
         }
     }
 
-    updateProjectiles(other){
-        for(let q = this.projectiles.length - 1; q >= 0; q--){       
+    updateProjectiles(otherTank){
+        for(let q = this.projectiles.length - 1; q >= 0; q--){    
+            
+            // check against other projectiles
             for(let j = q; j >= 0; j--){
                 if (this.projectiles[q] != this.projectiles[j]){
                     this.projectiles[q].resolveCollision(this.projectiles[j]);
                 }
             }
+
+            // check against planets and compute gravity
             for(let k of this.game.planets){
                 this.projectiles[q].resolveCollision(k);
                 this.projectiles[q].gravityForce(k);
             } 
-            for(let l of other.projectiles){
-                if (this != other){
+
+            // check against moons and compute gravity
+            for(let m of this.game.moons){
+                this.projectiles[q].resolveCollision(m);
+                this.projectiles[q].gravityForce(m);
+            }
+
+            // check against other tanks projectiles
+            for(let l of otherTank.projectiles){
+                if (this != otherTank){
                     this.projectiles[q].resolveCollision(l);
                 }
             }  
+
+            // check against tank and resolve hit
             for(let t of this.game.tanks){
                 this.projectiles[q].resolveHit(t);
                 if (this != t) {
@@ -199,6 +214,7 @@ class Tank {
                 }
             }  
 
+            // Forces, behaviours and movement
             this.projectiles[q].wrap();            
             this.projectiles[q].airResistance();
             this.projectiles[q].move();               
@@ -262,7 +278,7 @@ class Tank {
                 let pos = createVector(this.pos.x + X, this.pos.y + Y);
                 this.ruins.push(new Ruin(pos, vel, this));
             }
-            this.game.explosions.push(new Explosion(this.pos, 2, this.tankSize*100, 0, this.game));
+            this.game.explosions.push(new Explosion(this.pos, this.parentPlayer.color, 2, this.tankSize*100, 0, this.game));
             this.exploded = 1;
             console.log("Tank exploded");
         }
@@ -292,8 +308,8 @@ class Tank {
         for(let t of this.trajectory){
             push();
             fill(particle.color);
-            stroke(0);
-            ellipse(t.x, t.y, particle.rad * 0.5);
+            noStroke();
+            ellipse(t.x, t.y, particle.rad * 1);
             pop()
         }
     }

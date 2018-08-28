@@ -17,14 +17,15 @@ class Player{
         this.maxHp = 100;
         this.maxShotPower = 10;
         this.tankSize = height*0.03;
+        this.tankSize = constrain(this.tankSize, 8, 15);
 
          // Projectile parameters
          this.projectileDamage = 20;
-         this.projectileExplosionRadius = height*0.03;
+         this.projectileExplosionRadius = this.tankSize;
          this.projectileLife = 5;
-         this.projectileRadius = height*0.03*0.15;
+         this.projectileRadius = this.tankSize*0.15;
          this.projectileMass = 8;
-         this.projectileType = 2;
+         this.projectileType = 1;
     }
 
     setTank(tank){

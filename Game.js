@@ -3,23 +3,21 @@ class Game{
         this.numberOfPlayers = nop;
         this.players = [];
         this.planets = [];
+        this.moons = [];
         this.tanks = [];
         this.players = [];
         this.finishedPlayers = [];
         this.explosions = [];
+        this.winner;
+
         this.roundsPlayed = 0;
         this.gameInProgress = false;
         this.maxScore = 3000;
-        this.colorOfWinnerMenu = color("white");
-        this.colorOfWinnerMenu._array[3] = 0;
-        this.additiveAlpha = 0;
-        this.alpha = 1;
         this.init();
     }
 
     init(){
-        clearMenu();
-        this.alpha = 0;
+        menu.setGame(this);
 
         if(this.numberOfPlayers == 1){
             this.players.push(new Player('red', redPlayerControls));
@@ -29,7 +27,7 @@ class Game{
             this.players.push(new Player('green', bluePlayerControls));
         }
         if(!noMenu){
-            this.shopMenu();
+            menu.shopMenu();
         }else{
             this.newRound();
         }
@@ -47,6 +45,7 @@ class Game{
     clearTanksAndPlanets(game = this){
         game.tanks.splice(0, game.tanks.length);
         game.planets.splice(0, game.planets.length);
+        game.moons.splice(0, game.moons.length);
         game.finishedPlayers.splice(0, game.finishedPlayers.length);
     }
 
@@ -70,6 +69,9 @@ class Game{
                 q++;
             }
         }
+
+        let p = this.planets[0];
+        this.moons.push(new Moon(p, p.rad/4, 30, 1));
     }
 
     createTanks(){    
@@ -115,29 +117,20 @@ class Game{
     
         for(let t of this.tanks){
             if(t.hp > 0){
-                t.show();
-                t.showProjectiles();                
+                t.show();                                
             }    
+            t.showProjectiles();
             t.showRuins();        
+        }
+
+        for (let m of this.moons){
+            m.show();
         }
     
         for(let i = this.explosions.length - 1; i >= 0; i--){                 
             this.explosions[i].show();
-        }
-             
-        this.alpha += this.additiveAlpha;   
-        if (this.alpha > 0.2)  this.alpha = 0.2;
-        if (this.alpha < 0)  this.alpha = 0;
+        }   
 
-        this.colorOfWinnerMenu._array[3] = this.alpha;
-        push();
-        //this.colorOfWinnerMenu._array[3] = constrain(this.colorOfWinnerMenu._array[3], 0, 0.3);  
-        //this.colorOfWinnerMenu._array[3] = 0.5;  
-        noStroke();    
-        // console.log(this.colorOfWinnerMenu._array[3]);
-        fill(this.colorOfWinnerMenu);     
-        rect(0, 0, width, height);
-        pop()
     }
 
     
@@ -172,6 +165,10 @@ class Game{
            money = map(i + 1, 1, this.finishedPlayers.length, this.maxScore/2, this.maxScore);
            this.finishedPlayers[i].money += money;
         }
+
+        for(let i = 0; i < this.finishedPlayers.length - 1; i++){
+            this.finishedPlayers[i].lives--;
+         }
     }
 
     resolveGame() {
@@ -180,14 +177,14 @@ class Game{
             if (this.numberOfPlayersAlive() <= 1) {
                 this.pushAlivePlayer()
                 this.updatePlayerStatus();
-                this.roundsPlayed++;
-                this.gameInProgress = false;
-                let colorOfWinner = this.finishedPlayers[this.finishedPlayers.length - 1].color;
+                this.roundsPlayed++;                
+                this.winner = this.finishedPlayers[this.finishedPlayers.length - 1];
                 if (this.endOfGame()) {
-                    setTimeout(this.endGameMenu, textAnimationSpeed, colorOfWinner, this);
+                    setTimeout(menu.endGameMenu, textAnimationSpeed);
                 } else {
-                    setTimeout(this.endRoundMenu, textAnimationSpeed, colorOfWinner, this); 
+                    setTimeout(menu.endRoundMenu, textAnimationSpeed); 
                 }
+                this.gameInProgress = false;
             }
         }
     }
@@ -199,85 +196,85 @@ class Game{
         return false;
     }
 
-    endGameMenu(colorOfWinner, game = this) {
-        texts.push(new Text("  Winner!", width / 2, height * 0.3, height * 0.15, colorOfWinner));
-        texts.push(new Text("New game?", width * 0.5, height * 0.6));
-        texts.push(new Play("Yes", width * 0.4, height * 0.75, height * 0.10));
-        texts.push(new HomeMenu("No", width * 0.6, height * 0.75, height * 0.10));
-        game.colorOfWinnerMenu = color(colorOfWinner);
-        // game.colorOfWinnerMenu._array[3] = 0.5;
-        game.additiveAlpha = 0.001;
-    }
+    // endGameMenu(colorOfWinner, game = this) {
+    //     texts.push(new Text("  Winner!", width / 2, height * 0.3, height * 0.15, colorOfWinner));
+    //     texts.push(new Text("New game?", width * 0.5, height * 0.6));
+    //     texts.push(new Play("Yes", width * 0.4, height * 0.75, height * 0.10));
+    //     texts.push(new HomeMenu("No", width * 0.6, height * 0.75, height * 0.10));
+    //     game.colorOfWinnerMenu = color(colorOfWinner);
+    //     // game.colorOfWinnerMenu._array[3] = 0.5;
+    //     game.additiveAlpha = 0.001;
+    // }
 
-    endRoundMenu(colorOfWinner, game = this){
-        texts.push(new Text("Winner!", width/2, height/2, height*0.20, colorOfWinner));   
-        game.colorOfWinnerMenu = color(colorOfWinner);
-        game.additiveAlpha = 0.003;
+    // endRoundMenu(colorOfWinner, game = this){
+    //     texts.push(new Text("Winner!", width/2, height/2, height*0.20, colorOfWinner));   
+    //     game.colorOfWinnerMenu = color(colorOfWinner);
+    //     game.additiveAlpha = 0.003;
 
-        setTimeout(clearAnimation, textAnimationSpeed*4);
-        // setTimeout(function(){
-        //     game.clearTanksAndPlanets();
-        //     game.shopMenu();
-        // }, textAnimationSpeed*5);
-        setTimeout(game.clearTanksAndPlanets, textAnimationSpeed*5, game);
-        setTimeout(game.shopMenu, textAnimationSpeed*5, game);
+    //     setTimeout(clearAnimation, textAnimationSpeed*4);
+    //     // setTimeout(function(){
+    //     //     game.clearTanksAndPlanets();
+    //     //     game.shopMenu();
+    //     // }, textAnimationSpeed*5);
+    //     setTimeout(game.clearTanksAndPlanets, textAnimationSpeed*5, game);
+    //     setTimeout(game.shopMenu, textAnimationSpeed*5, game);
         
-    }
-        shopMenu(game = this, index = 0){
-        let moneyInfo = "Money: "+ game.players[index].money;
-        let plr = game.players[index];
-        let color = game.players[index].color;
-        let col1 = width*0.33;
-        let col2 = width*0.66;
-        let row1 = height*0.3;
-        let row2 = height*0.5
-        game.additiveAlpha = -0.01;
+    // }
+    // shopMenu(game = this, index = 0){
+    //     let moneyInfo = "Money: "+ game.players[index].money;
+    //     let plr = game.players[index];
+    //     let color = game.players[index].color;
+    //     let col1 = width*0.33;
+    //     let col2 = width*0.66;
+    //     let row1 = height*0.3;
+    //     let row2 = height*0.5
+    //     game.additiveAlpha = -0.01;
 
-        // texts.push(new Text("Player "+(index + 1), width*.5, height*0.06, height*0.11, color));
+    //     // texts.push(new Text("Player "+(index + 1), width*.5, height*0.06, height*0.11, color));
        
         
-        // Create interactive buttons
-        // 1 = max Hp of tank
-        // 2 = max shot power
-        // 3 = projectile damage
-        // 4 = explosion radius
-        // 5 = projectile type
-        fill(255);
-        texts.push(new Text("ARM",  col1 - width*0.08, row1, height*0.08, undefined));
-        texts.push(new Text("PWR",  col1 - width*0.08, row2, height*0.08, undefined));
-        texts.push(new Text("DMG",  col2 - width*0.08, row1, height*0.08, undefined));
-        texts.push(new Text("RAD",  col2 - width*0.08, row2, height*0.08, undefined));
-        // texts.push(new Text("Type", width*0.3, height*0.7, height*0.05, undefined));
-        // texts.push(new ShopItem(plr, "^", width*0.1, height*0.4, height*0.15, undefined, undefined, 2, 1, 700)); 
-        // texts.push(new ShopItem(plr, "^", width*0.1, height*0.5, height*0.15, undefined, undefined, 3, 5, 500)); 
-        // texts.push(new ShopItem(plr, "^", width*0.1, height*0.6, height*0.15, undefined, undefined, 4, 3, 550));
+    //     // Create interactive buttons
+    //     // 1 = max Hp of tank
+    //     // 2 = max shot power
+    //     // 3 = projectile damage
+    //     // 4 = explosion radius
+    //     // 5 = projectile type
+    //     fill(255);
+    //     texts.push(new Text("ARM",  col1 - width*0.08, row1, height*0.08, undefined));
+    //     texts.push(new Text("PWR",  col1 - width*0.08, row2, height*0.08, undefined));
+    //     texts.push(new Text("DMG",  col2 - width*0.08, row1, height*0.08, undefined));
+    //     texts.push(new Text("RAD",  col2 - width*0.08, row2, height*0.08, undefined));
+    //     // texts.push(new Text("Type", width*0.3, height*0.7, height*0.05, undefined));
+    //     // texts.push(new ShopItem(plr, "^", width*0.1, height*0.4, height*0.15, undefined, undefined, 2, 1, 700)); 
+    //     // texts.push(new ShopItem(plr, "^", width*0.1, height*0.5, height*0.15, undefined, undefined, 3, 5, 500)); 
+    //     // texts.push(new ShopItem(plr, "^", width*0.1, height*0.6, height*0.15, undefined, undefined, 4, 3, 550));
 
 
-        texts.push(new ShopItem(plr, "^",       col1,       row1 + height*0.05, height*0.15, color, undefined, 1, 15, 400));
-        texts.push(new ShopItem(plr, "^",       col1,       row2 + height*0.05, height*0.15, color, undefined, 2, 1, 300)); 
-        texts.push(new ShopItem(plr, "^",       col2,       row1 + height*0.05, height*0.15, color, undefined, 3, 5, 600)); 
-        texts.push(new ShopItem(plr, "^",       col2,       row2 + height*0.05, height*0.15, color, undefined, 4, 3, 350)); 
-        texts.push(new ShopItem(plr, "Normal",  width*0.24, height*0.7,         height*0.1, color, undefined, 5, 1, 0)); 
-        texts.push(new ShopItem(plr, "Shatter", width*0.5,  height*0.7,         height*0.1, color, undefined, 5, 2, 2983)); 
-        texts.push(new ShopItem(plr, "Triple",  width*0.75, height*0.7,         height*0.1, color, undefined, 5, 3, 3333));
+    //     texts.push(new ShopItem(plr, "^",       col1,       row1 + height*0.05, height*0.15, color, undefined, 1, 15, 400));
+    //     texts.push(new ShopItem(plr, "^",       col1,       row2 + height*0.05, height*0.15, color, undefined, 2, 1, 300)); 
+    //     texts.push(new ShopItem(plr, "^",       col2,       row1 + height*0.05, height*0.15, color, undefined, 3, 5, 600)); 
+    //     texts.push(new ShopItem(plr, "^",       col2,       row2 + height*0.05, height*0.15, color, undefined, 4, 3, 350)); 
+    //     texts.push(new ShopItem(plr, "Normal",  width*0.24, height*0.7,         height*0.1, color, undefined, 5, 1, 0)); 
+    //     texts.push(new ShopItem(plr, "Shatter", width*0.5,  height*0.7,         height*0.1, color, undefined, 5, 2, 2983)); 
+    //     texts.push(new ShopItem(plr, "Triple",  width*0.75, height*0.7,         height*0.1, color, undefined, 5, 3, 3333));
         
-        if (index < game.numberOfPlayers-1){
-            texts.push(new NextPlayer(game, "Next player", width*0.5, height*0.85, height*0.12, undefined, undefined, index))
-        }else{
-            texts.push(new NewRound(game, "Play round", width*0.5, height*0.85, height*0.12))
-        } 
+    //     if (index < game.numberOfPlayers-1){
+    //         texts.push(new NextPlayer(game, "Next player", width*0.5, height*0.85, height*0.12, undefined, undefined, index))
+    //     }else{
+    //         texts.push(new NewRound(game, "Play round", width*0.5, height*0.85, height*0.12))
+    //     } 
 
-        // Tank parameters
+    //     // Tank parameters
         
-        texts.push(new Text(round(plr.projectileExplosionRadius) + "",  col2 + width*0.08, row2, height*0.08, undefined));
-        texts.push(new Text(plr.projectileDamage + "",                  col2 + width*0.08, row1, height*0.08, undefined));
-        texts.push(new Text(plr.maxShotPower + "",                      col1 + width*0.08, row2, height*0.08, undefined));
-        texts.push(new Text(plr.maxHp + "",                             col1 + width*0.08, row1, height*0.08, undefined));
+    //     texts.push(new Text(round(plr.projectileExplosionRadius) + "",  col2 + width*0.08, row2, height*0.08, undefined));
+    //     texts.push(new Text(plr.projectileDamage + "",                  col2 + width*0.08, row1, height*0.08, undefined));
+    //     texts.push(new Text(plr.maxShotPower + "",                      col1 + width*0.08, row2, height*0.08, undefined));
+    //     texts.push(new Text(plr.maxHp + "",                             col1 + width*0.08, row1, height*0.08, undefined));
         
 
-        // Money info - has to be last
-        texts.push(new Text(moneyInfo, width*.48, height*0.1, height*0.15, color));
-    }
+    //     // Money info - has to be last
+    //     texts.push(new Text(moneyInfo, width*.48, height*0.1, height*0.15, color));
+    // }
 
     end(){
         for(let t of this.tanks){
@@ -289,7 +286,4 @@ class Game{
         this.planets.splice(0, this.planets.length);
         this.players.splice(0, this.players.length);
     }
-
-
-
 }

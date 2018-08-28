@@ -1,7 +1,8 @@
 class Explosion {
-    constructor(pos, time, maxR, damage, game){
+    constructor(pos, color, time, maxR, damage, game){
         this.game = game;
         this.pos = pos;
+        this.color = color;
         this.time = time;
         this.maxRad = maxR;
         this.rad = 0;
@@ -11,7 +12,9 @@ class Explosion {
 
     show(){   
         push();
-        fill(150, 50, 50, this.alfa);
+        this.color = color(this.color);
+        this.color._array[3] = this.alfa/255;
+        fill(this.color);
         stroke(0, this.alfa);
         // noStroke();
         ellipse(this.pos.x, this.pos.y, this.rad * 2);        

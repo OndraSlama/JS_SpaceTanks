@@ -21,13 +21,24 @@ class Particle {
         pop();   
         this.showPath(); 
     }
-
-    showPath(){
+    
+    move() {
+        this.pos.add(this.vel);
+        this.vel.add(this.acc);
+        this.acc = p5.Vector.div(this.force, this.mass);
+        this.forceHeading = this.force.heading();
+        this.force.set(0, 0);         
+        this.updatePath();
+    }
+    
+    updatePath(){
         this.history.push(this.pos.copy());
         if (this.history.length > this.pathLength){
             this.history.splice(0,1);
         }
+    }
 
+    showPath(){
         push();        
         noStroke();
         fill(this.color);
@@ -37,14 +48,6 @@ class Particle {
             }                
         }       
         pop();
-    }
-
-    move() {
-        this.pos.add(this.vel);
-        this.vel.add(this.acc);
-        this.acc = p5.Vector.div(this.force, this.mass);
-        this.forceHeading = this.force.heading();
-        this.force.set(0, 0);       
     }
 
     applyForce(force){

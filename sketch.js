@@ -5,6 +5,7 @@ let backgroundColor;
 let font;
 let mouse;
 let textAnimationSpeed = 1000;
+let pressedKeys = []; // to store pressed keys
 
 // Controls
 let redPlayerControls = [];
@@ -13,6 +14,9 @@ let bluePlayerControld = [];
 // Arrays
 let games = [];
 let texts = [];
+
+// Menu
+let menu;
 
 // Parameters
 let projectileRadius = 10;
@@ -29,7 +33,7 @@ let impulseDamp = 0.5;
 let airDamp = 0.05;
 
 // Debug
-let noMenu = 1;
+let noMenu = true;
 
 function preload(){
     font = loadFont('segoeuil.ttf');
@@ -39,7 +43,7 @@ function setup() {
 
     // Create canvas
     canvasWidth = windowWidth * 0.7;
-    canvasWidth = constrain(canvasWidth, 600, 900);
+    canvasWidth = constrain(canvasWidth, 600, 1200);
     canvasHeight = canvasWidth * 3/5;
     
     canvas1 = createCanvas(canvasWidth, canvasHeight);
@@ -49,10 +53,10 @@ function setup() {
     angleMode(DEGREES);
     textFont(font);
     textAlign(CENTER);
-    frameRate(300);
+    frameRate(60);
     
     // Game settings
-    redPlayerControls = [87, 83, 68, 65, 32];
+    redPlayerControls = [87, 83, 68, 65, 32]; // w s d a space
     bluePlayerControls = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];     
     backgroundColor = color(0, 0, 20);
     planetRadius = height/8;
@@ -63,8 +67,9 @@ function setup() {
     gameSpeedSlider = createSlider(1, 10, 1, 1);
     
     //Dynamic menu
+    menu = new Menu()
     if(!noMenu){
-        homeMenu();
+        menu.homeMenu();
     }else{
         createGameSesion();
     }
@@ -76,12 +81,13 @@ function draw() {
     mouse.set(mouseX, mouseY); 
     gameSpeed = gameSpeedSlider.value();
     
-    fill (255, 0, 0);
+    fill (255, 0, 0); 
 
-    if (texts.length > 0){
+    if (menu.texts.length > 0){
         background(backgroundColor);
-    }     
+    } 
 
+    // Show game
     for(let g of games){
         for(let f = 0; f < gameSpeed; f++){
             g.play();
@@ -91,11 +97,8 @@ function draw() {
         g.show();   
     }
 
-    // Loop through texts      
-    for(let t of texts){
-        t.show();
-        t.update();
-    }   
+    // Show menu
+    menu.show();
 
     // for(let i = planets.length - 1; i >= 0; i--){       
     //     planets[i].move();        

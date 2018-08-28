@@ -22,15 +22,14 @@ class Projectile extends Particle{
     }
 
     explode(){
-        this.game.explosions.push(new Explosion(this.pos, 1, this.damageRad, this.maxDamage, this.game));
+        this.game.explosions.push(new Explosion(this.pos, this.color, 1, this.damageRad, this.maxDamage, this.game));
     }
 
-    showPath(){
+    updatePath(){
         this.history.push(this.pos.copy());
-        //if (this.history.length > this.pathLength){
-        //    this.history.splice(0,1);
-        //}
+    }
 
+    showPath(){    
         push();
         noStroke();
         fill(this.color);

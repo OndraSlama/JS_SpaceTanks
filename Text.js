@@ -1,7 +1,7 @@
 class Text {
     constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.05) {
 
-        this.textSampleFactor = 8/size;
+        this.textSampleFactor = 6/size;
         if(this.textSampleFactor > 0.25) this.textSampleFactor = 0.25
         let tempBounds = font.textBounds(string, x, y, size);
 
@@ -37,7 +37,7 @@ class Text {
 
         // Others
         this.force = 200;
-        this.maxSpeed = 40;
+        this.maxSpeed = 20;
         this.minSpeed = .05;
         this.stayAwaydist = 0;
         this.forceDist = size / 4
@@ -49,11 +49,28 @@ class Text {
     }
 
     show() {
+        let previousDot = this.dots[0];
+
+        noFill();
+        stroke(this.color)
+        strokeWeight(this.size/30);
+        beginShape();
+    
         for (let d of this.dots) {
-            if(d.pos.dist(this.pos) > 5 || !this.clearingAnimation){
-                d.show();
+            // if(d.pos.dist(this.pos) > 5 || !this.clearingAnimation){
+            //     d.show();
+            // }
+            if(d.target.dist(previousDot.target) < this.size/3){
+                vertex(d.pos.x, d.pos.y);
+            }else{
+                endShape(CLOSE);
+                beginShape();
             }
-        }
+            previousDot = d;
+        }        
+
+        endShape(CLOSE);
+
         // ellipse(this.right, this.down, 5);
         // ellipse(this.right, this.up, 5);
         // ellipse(this.left, this.down, 5);
@@ -76,9 +93,9 @@ class Text {
 
                 d.seekTarget(this.force, this.maxSpeed, this.minSpeed);
 
-                if(!this.interactive) d.runFromTarget(this.force/3, this.forceDist, mouse);
+                if(!this.interactive) d.runFromTarget(this.force/5, this.forceDist, mouse);
 
-                if(this.inArea() && this.interactive) d.seekTarget(this.force, this.maxSpeed/2, this.minSpeed, mouse);
+                if(this.inArea() && this.interactive) d.seekTarget(this.force, this.maxSpeed, this.minSpeed, mouse);
 
                 d.stayAwayFromTarget(this.forceDist / 4, mouse);
                 // for(let q of this.dots){                
@@ -122,7 +139,7 @@ class Text {
 
     clicked() {
         if (this.inArea() && this.interactive) {
-            for(let t of texts){
+            for(let t of menu.texts){
                 t.clickedFlag = 0;
             }
             this.clickedFlag = 1;
@@ -154,6 +171,16 @@ class Text {
     }
 }
 
+// class Letter {
+//     constructor(){
+//         this.dots = [];
+//     }
+
+//     show(){
+
+//     }
+// }
+
 class Play extends Text {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
@@ -161,7 +188,7 @@ class Play extends Text {
     }
 
     clickFunction() {
-        clearAnimation();
+        menu.clearAnimation();
         setTimeout(createGameSesion, textAnimationSpeed, 2);
     }
 
@@ -175,7 +202,7 @@ class Mode extends Text {
     }
 
     clickFunction() {
-        clearAnimation();
+        menu.clearAnimation();
         setTimeout(createGameSesion, textAnimationSpeed, this.value);
     }
 
@@ -188,8 +215,8 @@ class Settings extends Text {
     }
 
     clickFunction() {
-        clearAnimation();
-        setTimeout(settingsMenu, textAnimationSpeed);
+        menu.clearAnimation();
+        setTimeout(menu.settingsMenu, textAnimationSpeed);
     }
 
 }
@@ -201,37 +228,35 @@ class HomeMenu extends Text {
     }
 
     clickFunction() {
-        clearAnimation();
-        setTimeout(homeMenu, textAnimationSpeed);
+        menu.clearAnimation();
+        setTimeout(menu.homeMenu, textAnimationSpeed);
     }
 
 }
 
 class NewRound extends Text {
-    constructor(game, string, x, y, size, color, diameter) {
+    constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
-        this.game = game;
         this.interactive = 1;
     }
 
     clickFunction() {
-        clearAnimation();
-        setTimeout(playNewRound, textAnimationSpeed, this.game);
+        menu.clearAnimation();
+        setTimeout(menu.roundCoutdown, textAnimationSpeed, menu.game);
     }
 
 }
 
 class NextPlayer extends Text {
-    constructor(game, string, x, y, size, color, diameter, value) {
+    constructor(string, x, y, size, color, diameter, value) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
-        this.game = game;
         this.value = value;
         this.interactive = 1;
     }
 
     clickFunction() {
-        clearAnimation();
-        setTimeout(this.game.shopMenu, textAnimationSpeed, this.game, this.value + 1);
+        menu.clearAnimation();
+        setTimeout(menu.shopMenu, textAnimationSpeed, this.value + 1);
     }
 }
 
@@ -253,28 +278,28 @@ class ShopItem extends Text {
             switch (this.target) {
                 case 1:
                     this.player.maxHp += this.value;
-                    texts[texts.length - this.target - 1].changeText(this.player.maxHp + "");
+                    menu.texts[menu.texts.length - this.target - 1].changeText(this.player.maxHp + "");
                     break;
 
                 case 2:
                     this.player.maxShotPower += this.value;
-                    texts[texts.length - this.target - 1].changeText(this.player.maxShotPower + "");
+                    menu.texts[menu.texts.length - this.target - 1].changeText(this.player.maxShotPower + "");
                     break;
 
                 case 3:
                     this.player.projectileDamage += this.value;
-                    texts[texts.length - this.target - 1].changeText(this.player.projectileDamage + "");
+                    menu.texts[menu.texts.length - this.target - 1].changeText(this.player.projectileDamage + "");
                     break;
 
                 case 4:
                     this.player.projectileExplosionRadius += this.value;
-                    texts[texts.length - this.target - 1].changeText(round(this.player.projectileExplosionRadius) + "");
+                    menu.texts[menu.texts.length - this.target - 1].changeText(round(this.player.projectileExplosionRadius) + "");
                     break;
 
                 case 5:
                     this.player.projectileType = this.value;
                     if (this.active) this.player.money += this.cost;
-                    for (let t of texts) {
+                    for (let t of menu.texts) {
                         t.active = 0;
                     }
                     this.active = 1;
@@ -285,7 +310,7 @@ class ShopItem extends Text {
             }
            this.player.money -= this.cost;
         }        
-        texts[texts.length - 1].changeText("Money: "+ this.player.money);
+        menu.texts[menu.texts.length - 1].changeText("Money: "+ this.player.money);
     }
 
 }
