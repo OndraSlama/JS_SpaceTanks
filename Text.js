@@ -1,7 +1,7 @@
 class Text {
-    constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.05) {
+    constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.08) {
 
-        this.textSampleFactor = 6/size;
+        this.textSampleFactor = 30/size;
         if(this.textSampleFactor > 0.25) this.textSampleFactor = 0.25
         let tempBounds = font.textBounds(string, x, y, size);
 
@@ -10,7 +10,8 @@ class Text {
             simplifyThreshold: 0
         });
 
-        let bounds = font.textBounds(string, x, y + tempBounds.h / 2, size);
+        // Determine hitbox
+        this.bounds = font.textBounds(string, x, y + tempBounds.h / 2, size);
 
         // Create particles
         this.dots = [];
@@ -28,12 +29,7 @@ class Text {
         this.size = size;
         this.color = color;
         this.dotRadius = radius;
-
-        // Determine hitbox
-        this.left = bounds.x;
-        this.right = bounds.x + bounds.w;
-        this.down = bounds.y + bounds.h;
-        this.up = bounds.y;
+        
 
         // Others
         this.force = 200;
@@ -52,15 +48,17 @@ class Text {
         let previousDot = this.dots[0];
 
         noFill();
+        // fill(this.color)
+        // noStroke();
         stroke(this.color)
-        strokeWeight(this.size/30);
+        strokeWeight(this.size/80);
         beginShape();
     
         for (let d of this.dots) {
             // if(d.pos.dist(this.pos) > 5 || !this.clearingAnimation){
             //     d.show();
             // }
-            if(d.target.dist(previousDot.target) < this.size/3){
+            if(d.target.dist(previousDot.target) < this.size/4 && d.pos.dist(previousDot.pos) < this.size/6){
                 vertex(d.pos.x, d.pos.y);
             }else{
                 endShape(CLOSE);
@@ -70,6 +68,12 @@ class Text {
         }        
 
         endShape(CLOSE);
+
+        // for (let d of this.dots) {
+        //         if(d.pos.dist(this.pos) > 5 || !this.clearingAnimation){
+        //             d.show();
+        //         }              
+        //     } 
 
         // ellipse(this.right, this.down, 5);
         // ellipse(this.right, this.up, 5);
@@ -93,11 +97,14 @@ class Text {
 
                 d.seekTarget(this.force, this.maxSpeed, this.minSpeed);
 
-                if(!this.interactive) d.runFromTarget(this.force/5, this.forceDist, mouse);
+                // if(!this.interactive) d.runFromTarget(this.force/5, this.forceDist, mouse);
+
+                //if(this.inArea() && !this.interactive) d.seekTarget(this.force, this.maxSpeed, this.minSpeed, mouse);
 
                 if(this.inArea() && this.interactive) d.seekTarget(this.force, this.maxSpeed, this.minSpeed, mouse);
 
-                d.stayAwayFromTarget(this.forceDist / 4, mouse);
+                //d.stayAwayFromTarget(this.forceDist / 2, mouse);
+
                 // for(let q of this.dots){                
                 //     d.resolveCollision(q);
                 // }
@@ -111,13 +118,15 @@ class Text {
 
     changeText(newString) {
         let tempBounds = font.textBounds(newString, this.x, this.y, this.size);
+        
+        // Update hitbox
+        this.bounds = font.textBounds(newString, this.x - tempBounds.w / 2, this.y + tempBounds.h / 2, this.size);
 
         let tempDots = font.textToPoints(newString, this.x - tempBounds.w / 2, this.y + tempBounds.h / 2, this.size, {
             sampleFactor: this.textSampleFactor,
             simplifyThreshold: 0
         });
 
-        let bounds = font.textBounds(newString, this.x - tempBounds.w / 2, this.y + tempBounds.h / 2, this.size);
 
         let diff = tempDots.length - this.dots.length;
 
@@ -154,8 +163,8 @@ class Text {
     }
 
     inArea() {
-        if (mouseX < this.left || mouseX > this.right) return false;
-        if (mouseY < this.up || mouseY > this.down) return false;
+        if (mouseX < this.bounds.x || mouseX > this.bounds.x + this.bounds.w) return false;
+        if (mouseY < this.bounds.y || mouseY > this.bounds.y + this.bounds.h) return false;
         return true;
     }
 

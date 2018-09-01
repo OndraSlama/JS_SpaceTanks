@@ -22,7 +22,7 @@ class Dot extends Particle {
         // this.showPath();    
     }
 
-    seekTarget(force, maxSpeed, minSpeed, target = this.target){ //target = this.target){
+    seekTarget(force, maxSpeed, minSpeed, target = this.target){
         let maxForce = force;
         let desired = p5.Vector.sub(target, this.pos);
         let d = desired.mag();
@@ -30,6 +30,26 @@ class Dot extends Particle {
         if (d < 200){
              vel = map(d, 0, 200, minSpeed, maxSpeed);
         }
+
+        desired.setMag(vel);
+        let steer = p5.Vector.sub(desired, this.vel);
+        steer.limit(maxForce);
+        this.applyForce(steer);
+    }
+
+    atractToTarget(force, maxSpeed, minSpeed, dist = 1000000, target = this.target){
+        let maxForce = force;
+        let desired = p5.Vector.sub(target, this.pos);
+        let d = desired.mag();
+        let vel = maxSpeed;
+        if (d < 200){
+             vel = map(d, 0, 200, maxSpeed, minSpeed);
+        }
+        
+        if (d > dist){
+            vel = 0;
+        }
+
         desired.setMag(vel);
         let steer = p5.Vector.sub(desired, this.vel);
         steer.limit(maxForce);
