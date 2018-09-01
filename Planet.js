@@ -34,32 +34,17 @@ class Planet {
     }
 }
 
-class Moon extends Planet {
+class Moon extends Dot {
     constructor (planet, r, orbit, m = r * r) {        
         let x = planet.pos.x;
         let y = planet.pos.y + planet.rad + orbit;
-        super(x, y, r, m)
+        let pos = createVector(x,y);
+        super(pos, r, "white", pos)
 
         this.planet = planet;
         this.orbit = orbit;
+        this.mass = m;
         this.invMass = 1/m;
         this.color = color(200);
-        this.target;
-    } 
-
-    seekTarget(target = this.target){ //target = this.target){
-        let maxForce = 200;
-        let maxSpeed = 5
-        let desired = p5.Vector.sub(target, this.pos);
-        let d = desired.mag();
-        let vel = maxSpeed;
-        if (d < 200){
-             vel = map(d, 0, 200, 0, maxSpeed);
-        }
-        desired.setMag(vel);
-        let steer = p5.Vector.sub(desired, this.vel);
-        steer.limit(maxForce);
-        this.applyForce(steer);
     }
-
 }

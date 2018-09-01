@@ -33,7 +33,7 @@ let impulseDamp = 0.5;
 let airDamp = 0.05;
 
 // Debug
-let noMenu = false;
+let noMenu = true;
 
 function preload(){
     font = loadFont('segoeuil.ttf');
