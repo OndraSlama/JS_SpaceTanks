@@ -12,6 +12,7 @@ class Player{
         this.LEFT = controls[2];
         this.RIGHT = controls[3];        
         this.SHOOT = controls[4]; 
+        this.JUMP = controls[5];
 
         // Tank parameters
         this.maxHp = 100;
@@ -25,7 +26,7 @@ class Player{
          this.projectileLife = 5;
          this.projectileRadius = this.tankSize*0.15;
          this.projectileMass = 8;
-         this.projectileType = 1;
+         this.projectileType = 4;
     }
 
     setTank(tank){

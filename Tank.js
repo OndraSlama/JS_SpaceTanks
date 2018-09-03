@@ -1,23 +1,29 @@
-class Tank {
-    constructor(a, p, player, game){        
+class Tank extends Particle {
+    constructor(planet, player, game){    
+        let pos = planet.pos.copy();
+        pos.x += planet.rad;
+        super(pos);
         
+        // Object references
         this.game = game;
+        this.planet = planet;
+        this.parentPlayer = player;
 
         // Tank parameters
-        this.planet = p;
-        this.invMass = 0;        
-        this.maxHp = player.maxHp ;
+        this.mass = player.maxHp/3;
+        this.invMass = 1/this.mass;
+        this.maxAcc = 1;     
+        this.maxVel = 1;   
+        this.maxHp = player.maxHp;
         this.hp = player.maxHp;
         this.tankSize = player.tankSize * 0.005 * (100 + this.maxHp);
         this.tankSize = constrain(this.tankSize, 8, 25);
         this.barrelLength = this.tankSize;
         this.barrelWidth = this.barrelLength * 0.25;      
-        this.hitBoxRadius = this.tankSize*0.7;
+        this.hitBoxRadius = this.tankSize*0.5;
         this.maxShotPower = player.maxShotPower;
         
         // State variables
-        this.pos = createVector();
-        this.vel = createVector();
         this.barrelPos = createVector();
         this.rad = this.hitBoxRadius;
         this.shotPower = 0;
@@ -29,9 +35,9 @@ class Tank {
 
         // Statuses
         this.exploded = 0;
+        this.onPlanet = 1;
 
         // Objects
-        this.parentPlayer = player;
         this.projectiles = [];
         this.ruins = [];
 
@@ -57,7 +63,7 @@ class Tank {
         //         __//_
         //      __/__.__\__     _
         //    /      2      \    |
-        //    \ _____._____ /   _| tankHeight
+        //    \ _____*_____ /   _| tankHeight
         //           1
         //      |_________|
         //       tankWidth
@@ -66,10 +72,10 @@ class Tank {
 
         // Draw tank
         
-        translate(this.planet.pos); // center of planet 
-        rotate(this.relativeAngle); // rotate so that X axis is parallel with tankAngle
-        translate(this.planet.rad, 0); // translate to the edge of planet where the tank sits (point 1)
-        translate(tankHeight, 0); // translate to point 2
+        translate(this.pos); // center of planet 
+        rotate(this.forceHeading + 180); // rotate so that X axis is parallel with tankAngle
+        // translate(this.planet.rad, 0); // translate to the edge of planet where the tank sits (point 1)
+        // translate(tankHeight/2, 0); // translate to point 2
         rotate(this.barrelAngle); // rotate so the barrel is parallel with X axis
 
         // Draw barrel
@@ -99,12 +105,10 @@ class Tank {
 
         translate(-tankHeight, 0); // translate back to point 1
         rectMode(CORNER);
-        //ellipse(tankHeight/2, tankWidth/2, tankHeight); // draw rounded ends of the body
-        //ellipse(tankHeight/2, -tankWidth/2, tankHeight); 
+        
         rect(0, -tankWidth/2, tankHeight, tankWidth, tankHeight*0.6, tankHeight*0.6); // draw body of the tank
         noStroke();
-        //ellipse(tankHeight/2, tankWidth/2, tankHeight - this.tankSize/12, tankHeight/2); // for fixing odd look
-        //ellipse(tankHeight/2, -tankWidth/2, tankHeight -this.tankSize/12, tankHeight/2);
+        
 
         // Draw power bar
         let healthBarLength = map(this.hp, 0, this.maxHp, 0, tankWidth)       
@@ -121,10 +125,23 @@ class Tank {
     control(){
 
         // Movement
-        if (keyIsDown(this.parentPlayer.LEFT)) this.relativeAngle += this.relativeVel;
-        if (keyIsDown(this.parentPlayer.RIGHT)) this.relativeAngle -= this.relativeVel;
+        if (keyIsDown(this.parentPlayer.LEFT) && this.onPlanet){
+            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading - 90), this.maxAcc)
+            this.acc.add(acceleration);
+        }        
+        if (keyIsDown(this.parentPlayer.RIGHT) && this.onPlanet){
+            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading + 90), this.maxAcc)
+            this.acc.add(acceleration);
+        }        
+        if (keyIsDown(this.parentPlayer.JUMP) && this.onPlanet){
+            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading + 180), this.maxAcc)
+            this.acc.add(acceleration);
+            this.pos.add(p5.Vector.fromAngle(radians(this.forceHeading + 180), 2))
+            this.onPlanet = false;            
+        }
         if (keyIsDown(this.parentPlayer.CW)) this.barrelAngle += this.barrelVel;
         if (keyIsDown(this.parentPlayer.CCW)) this.barrelAngle -= this.barrelVel;
+
 
         if(abs(this.barrelAngle) > 90) this.barrelAngle = sign(this.barrelAngle)*90;
 
@@ -141,15 +158,51 @@ class Tank {
         }
     }
 
+    move() {
+        this.pos.add(this.vel);
+        this.vel.add(this.acc);
+        if(this.onPlanet) this.vel.limit(this.maxVel)
+        this.acc = p5.Vector.div(this.force, this.mass);
+        this.forceHeading = this.force.heading();
+        this.dynamicTankBehaviour();
+        this.force.set(0, 0);    
+    }
+
+    dynamicTankBehaviour(){
+        for(let p of this.game.planets){
+            if(p.pos.dist(this.pos) < p.rad + this.rad + 2){
+                this.forceHeading = p5.Vector.sub(p.pos, this.pos).heading();
+                this.onPlanet = true;
+                this.planet = p;
+                this.vel.mult(0.8);
+            }            
+        }
+
+        for(let m of this.game.moons){
+            if(m.pos.dist(this.pos) < m.rad + this.rad + 2){
+                this.forceHeading = p5.Vector.sub(m.pos, this.pos).heading();
+                this.onPlanet = true;
+                this.planet = m;
+                this.vel.mult(0.8);
+            }            
+        }
+        
+        let dist = this.planet.pos.dist(this.pos);
+        let touchingDistance = this.planet.rad + this.rad;
+
+        if(dist > touchingDistance + 2 && this.onPlanet){
+            this.pos.add(p5.Vector.fromAngle(radians(this.forceHeading), .5))        
+        }
+
+        if(dist > touchingDistance + 5 && this.onPlanet){
+            this.onPlanet = false;
+        }
+    }
+
     updatePositions(){
-        this.absoluteAngle = this.relativeAngle + this.barrelAngle; 
-
-        let relativeTankVector = p5.Vector.fromAngle(radians(this.relativeAngle), this.planet.rad);
-        this.pos = p5.Vector.add(this.planet.pos, relativeTankVector); 
-
-        let relativeMiddleVector = p5.Vector.fromAngle(radians(this.relativeAngle), this.tankSize/2);
+        this.absoluteAngle = this.forceHeading + 180 + this.barrelAngle; 
         let relativeBarrelVector = p5.Vector.fromAngle(radians(this.absoluteAngle), this.barrelLength);        
-        this.barrelPos = p5.Vector.add(p5.Vector.add(this.pos, relativeMiddleVector), relativeBarrelVector);
+        this.barrelPos = p5.Vector.add(this.pos, relativeBarrelVector);
     }
 
     shoot(power = this.shotPower, type = this.projectileType){    
@@ -170,6 +223,9 @@ class Tank {
                 break;
             case 5:
                 this.projectiles.push(new ChainProjectile(this.barrelPos, shot, this));
+                break;
+            case 6:
+                this.projectiles.push(new GuidedProjectile(this.barrelPos, shot, this));
                 break;
             
             default:
@@ -289,13 +345,25 @@ class Tank {
         let shot = p5.Vector.fromAngle(radians(this.absoluteAngle), this.shotPower);
         let particle = new Projectile(this.barrelPos, shot, this);
         let showEvery = 8;
+        let prevInvMass;
 
         for(let i = 0; i < showEvery*this.trajectoryLength; i++ ){
 
             for(let k of this.game.planets){
+                prevInvMass = k.invMass;
+                k.invMass = 0;
                 particle.resolveCollision(k);
                 particle.gravityForce(k);
-            }            
+                k.invMass = prevInvMass;
+            }  
+            
+            for(let m of this.game.moons){
+                prevInvMass = m.invMass;
+                m.invMass = 0;
+                particle.resolveCollision(m);
+                particle.gravityForce(m);
+                m.invMass = prevInvMass;
+            } 
             
             particle.wrap();           
             particle.airResistance();

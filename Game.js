@@ -59,7 +59,7 @@ class Game{
         this.planets.splice(0, this.planets.length);     
 
         this.planets.push(new Planet(random(x[0], x[1]), random(y[0], y[1]), random(r[0], r[1])));
-        while (this.planets.length < 4) { // minimum of 4 planets        
+        while (this.planets.length < 4) { // minimum of 4 planets
             if (q-- < -10000) break; // in case there are still less then 3 planets after X tries
             while (this.planets.length < maxPlanets && q < 100) { // will try to generate random planet until there are 6 of them or after 100 tries
                 temp = new Planet(random(x[0], x[1]), random(y[0], y[1]), random(r[0], r[1]));
@@ -71,14 +71,19 @@ class Game{
         }
 
         let p = this.planets[0];
-        this.moons.push(new Moon(p, p.rad/4, 30, 1));
+        // x = p.pos.x;
+        // y = p.pos.y + p.rad + 30;
+        // let pos = createVector(x,y);
+        this.moons.push(new Moon(p));
+        // this.moons.push(new Projectile(pos, undefined, this.tanks[0]));
+        // this.planets.push(new Planet(x, y, p.rad/4));
     }
 
     createTanks(){    
         if (this.planets.length > 1){
             this.tanks.splice(0, this.tanks.length);
-            for(let p of this.players){        
-                let temp = new Tank(0, this.planets[this.tanks.length], p, this);   
+            for(let p of this.players){
+                let temp = new Tank(this.planets[this.tanks.length], p, this);   
                 p.setTank(temp);
                 this.tanks.push(temp);
             }
@@ -86,21 +91,46 @@ class Game{
     }
 
     play(){
-        for(let i = this.planets.length - 1; i >= 0; i--){       
-            this.planets[i].move();   
+        for(let p of this.planets){       
+            p.move();   
+        }
+
+        for(let m of this.moons){       
+            m.move();
+            m.orbitPlanet();
+            m.seekTarget(15);
+            
+            for(let p of this.planets){       
+                m.resolveCollision(p);  
+            }
         }
     
         for(let t of this.tanks){
             if(t.hp > 0){
+                for(let p of this.planets){       
+                    t.gravityForce(p);  
+                    t.resolveCollision(p); 
+                }
+
+                for(let m of this.moons){       
+                    t.gravityForce(m);  
+                    t.resolveCollision(m); 
+                }
+
+                for(let t2 of this.tanks){    
+                    if(t != t2)     
+                    t.resolveCollision(t2); 
+                }
                 t.control();
+                t.move();
+                t.bounce();
             }else{
                 t.explode();
-            }        
+            }
             for(let t2 of this.tanks){
                 t.updateProjectiles(t2);
                 t.updateRuins(t2);
             }
-            
         }
     
         for(let i = this.explosions.length - 1; i >= 0; i--){            
@@ -131,9 +161,7 @@ class Game{
             this.explosions[i].show();
         }   
 
-    }
-
-    
+    }    
 
     numberOfPlayersAlive(){
         let numberOfPlayersAlive = 0;

@@ -182,7 +182,7 @@ class Particle {
                 // Position corection            
                 let percent = 0.7; // usually 20% to 80%
                 let slop = 0.02; // usually 0.01 to 0.1
-                let penetration = maxDistanceToOverlap / 2 - d;
+                let penetration = maxDistanceToOverlap - d;
                 let correctionMag = max(penetration - slop * maxDistanceToOverlap, 0) / (this.invMass + other.invMass) * percent;
                 let correction = p5.Vector.mult(normal, correctionMag);
 

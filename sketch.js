@@ -56,8 +56,8 @@ function setup() {
     frameRate(60);
     
     // Game settings
-    redPlayerControls = [87, 83, 68, 65, 32]; // w s d a space
-    bluePlayerControls = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT];     
+    redPlayerControls = [87, 83, 68, 65, 70, 32]; // w s d a f space
+    bluePlayerControls = [UP_ARROW , DOWN_ARROW, RIGHT_ARROW, LEFT_ARROW, SHIFT, 13];     // 13 = enter
     backgroundColor = color(0, 0, 20);
     planetRadius = height/8;
 

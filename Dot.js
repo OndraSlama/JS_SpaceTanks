@@ -22,7 +22,7 @@ class Dot extends Particle {
         // this.showPath();    
     }
 
-    seekTarget(force, maxSpeed, minSpeed, target = this.target){
+    seekTarget(force, maxSpeed, minSpeed = 0, target = this.target){
         let maxForce = force;
         let desired = p5.Vector.sub(target, this.pos);
         let d = desired.mag();
