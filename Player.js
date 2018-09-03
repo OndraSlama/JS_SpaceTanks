@@ -26,7 +26,7 @@ class Player{
          this.projectileLife = 5;
          this.projectileRadius = this.tankSize*0.15;
          this.projectileMass = 8;
-         this.projectileType = 4;
+         this.projectileType = 6;
     }
 
     setTank(tank){

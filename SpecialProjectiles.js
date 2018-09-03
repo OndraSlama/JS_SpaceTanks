@@ -58,7 +58,7 @@ class ShotgunProjectile extends Projectile {
         tank.projectileRadius = prevRad*0.4;
 
         for(let i = 0; i < 4; i++){
-            tank.barrelAngle = prevAngle + 3*(i-2) + 1
+            tank.barrelAngle = prevAngle + 4*(i-2) + 1
             tank.shoot(power, type);
         }   
         

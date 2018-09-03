@@ -110,7 +110,7 @@ class Text {
                 // }
             }else{   
                 this.additiveDist = 15;
-                this.clickedFlag ? d.stayAwayFromTarget(this.stayAwaydist, this.pos) : d.seekTarget(this.force, this.maxSpeed/2, 0, this.pos);
+                this.clickedFlag ? d.stayAwayFromTarget(this.stayAwaydist) : d.seekTarget(this.force, this.maxSpeed/2, 0, this.pos);
             }
         }
         //this.stayAwaydist = size/8;

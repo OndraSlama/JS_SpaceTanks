@@ -111,7 +111,7 @@ class Tank extends Particle {
         
 
         // Draw power bar
-        let healthBarLength = map(this.hp, 0, this.maxHp, 0, tankWidth)       
+        let healthBarLength = map(this.hp, 0, this.maxHp, 0, tankWidth);       
         fill(this.parentPlayer.color);
         rect(-tankHeight * 0.8, -tankWidth * 0.5, tankHeight * 0.5, healthBarLength);
         pop();     
@@ -126,17 +126,17 @@ class Tank extends Particle {
 
         // Movement
         if (keyIsDown(this.parentPlayer.LEFT) && this.onPlanet){
-            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading - 90), this.maxAcc)
+            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading - 90), this.maxAcc);
             this.acc.add(acceleration);
         }        
         if (keyIsDown(this.parentPlayer.RIGHT) && this.onPlanet){
-            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading + 90), this.maxAcc)
+            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading + 90), this.maxAcc);
             this.acc.add(acceleration);
         }        
         if (keyIsDown(this.parentPlayer.JUMP) && this.onPlanet){
-            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading + 180), this.maxAcc)
+            let acceleration = p5.Vector.fromAngle(radians(this.forceHeading + 180), this.maxAcc);
             this.acc.add(acceleration);
-            this.pos.add(p5.Vector.fromAngle(radians(this.forceHeading + 180), 2))
+            this.pos.add(p5.Vector.fromAngle(radians(this.forceHeading + 180), 2));
             this.onPlanet = false;            
         }
         if (keyIsDown(this.parentPlayer.CW)) this.barrelAngle += this.barrelVel;
@@ -161,7 +161,7 @@ class Tank extends Particle {
     move() {
         this.pos.add(this.vel);
         this.vel.add(this.acc);
-        if(this.onPlanet) this.vel.limit(this.maxVel)
+        if(this.onPlanet) this.vel.limit(this.maxVel);
         this.acc = p5.Vector.div(this.force, this.mass);
         this.forceHeading = this.force.heading();
         this.dynamicTankBehaviour();
@@ -179,7 +179,7 @@ class Tank extends Particle {
         }
 
         for(let m of this.game.moons){
-            if(m.pos.dist(this.pos) < m.rad + this.rad + 2){
+            if(m.pos.dist(this.pos) < m.rad + this.rad + 3){
                 this.forceHeading = p5.Vector.sub(m.pos, this.pos).heading();
                 this.onPlanet = true;
                 this.planet = m;
