@@ -1,34 +1,34 @@
 class Dot extends Particle {
-    constructor(pos, r = 8, c = "white", spawnPos = undefined){
+    constructor(pos, r = 8, c = "white", spawnPos = undefined) {
         super(pos);
         this.rad = r;
         this.color = c;
-        this.target = pos.copy(); 
-        if(spawnPos == undefined){       
-            let tempX = (width/2 - sign(random(-1,1)) * random(width/2, width));            
-            let tempY = (height/2 + sign(random(-1,1)) * random(height/2, height));
-            this.pos = createVector(tempX, tempY);  
-        }else{
-            this.pos = spawnPos.copy();  
-        }           
+        this.target = pos.copy();
+        if (spawnPos == undefined) {
+            let tempX = (width / 2 - sign(random(-1, 1)) * random(width / 2, width));
+            let tempY = (height / 2 + sign(random(-1, 1)) * random(height / 2, height));
+            this.pos = createVector(tempX, tempY);
+        } else {
+            this.pos = spawnPos.copy();
+        }
     }
 
-    show() {       
-        push(); 
-        fill(this.color); 
+    show() {
+        push();
+        fill(this.color);
         noStroke();
-        ellipse(this.pos.x, this.pos.y, 2 * this.rad); 
-        pop();  
+        ellipse(this.pos.x, this.pos.y, 2 * this.rad);
+        pop();
         // this.showPath();    
     }
 
-    seekTarget(force, maxSpeed, minSpeed = 0, target = this.target){
+    seekTarget(force, maxSpeed, minSpeed = 0, target = this.target) {
         let maxForce = force;
         let desired = p5.Vector.sub(target, this.pos);
         let d = desired.mag();
         let vel = maxSpeed;
-        if (d < 200){
-             vel = map(d, 0, 200, minSpeed, maxSpeed);
+        if (d < 200) {
+            vel = map(d, 0, 200, minSpeed, maxSpeed);
         }
 
         desired.setMag(vel);
@@ -37,16 +37,16 @@ class Dot extends Particle {
         this.applyForce(steer);
     }
 
-    atractToTarget(force, maxSpeed, minSpeed, dist = 1000000, target = this.target){
+    atractToTarget(force, maxSpeed, minSpeed, dist = 1000000, target = this.target) {
         let maxForce = force;
         let desired = p5.Vector.sub(target, this.pos);
         let d = desired.mag();
         let vel = maxSpeed;
-        if (d < 200){
-             vel = map(d, 0, 200, maxSpeed, minSpeed);
+        if (d < 200) {
+            vel = map(d, 0, 200, maxSpeed, minSpeed);
         }
-        
-        if (d > dist){
+
+        if (d > dist) {
             vel = 0;
         }
 
@@ -55,20 +55,20 @@ class Dot extends Particle {
         steer.limit(maxForce);
         this.applyForce(steer);
     }
-    
-    runFromTarget(force, dist, target = this.target){ //target = this.target){
-        let maxSpeed = force/20;
+
+    runFromTarget(force, dist, target = this.target) { //target = this.target){
+        let maxSpeed = force / 20;
         let maxForce = force;
         let desired = p5.Vector.sub(target, this.pos);
         let d = desired.mag();
         let vel = 0;
-        let steer = createVector(0,0);
-        if (d < dist){
+        let steer = createVector(0, 0);
+        if (d < dist) {
             vel = map(d, 0, dist, maxSpeed, .2);
             desired.setMag(vel);
             steer = p5.Vector.sub(desired, this.vel);
         }
-        
+
         steer.limit(maxForce);
         steer.mult(-1);
         this.applyForce(steer);
