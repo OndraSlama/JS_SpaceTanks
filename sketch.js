@@ -33,13 +33,15 @@ let impulseDamp = 0.5;
 let airDamp = 0.05;
 
 // Debug
-let noMenu = true;
+let noMenu = false;
 
 function preload(){
     font = loadFont('segoeuil.ttf');
 }
 
 function setup() {
+
+    
 
     // Create canvas
     canvasWidth = windowWidth * 0.7;

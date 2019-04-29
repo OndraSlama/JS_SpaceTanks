@@ -1,7 +1,7 @@
 class Text {
-    constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.08) {
+    constructor(string, x, y, size = height * 0.11, color = "gray", radius = size * 0.06) {
 
-        this.textSampleFactor = 30/size;
+        this.textSampleFactor = 8/size;
         if(this.textSampleFactor > 0.25) this.textSampleFactor = 0.25
         let tempBounds = font.textBounds(string, x, y, size);
 
@@ -55,16 +55,16 @@ class Text {
         beginShape();
     
         for (let d of this.dots) {
-            // if(d.pos.dist(this.pos) > 5 || !this.clearingAnimation){
-            //     d.show();
-            // }
-            if(d.target.dist(previousDot.target) < this.size/4 && d.pos.dist(previousDot.pos) < this.size/6){
-                vertex(d.pos.x, d.pos.y);
-            }else{
-                endShape(CLOSE);
-                beginShape();
+            if(d.pos.dist(this.pos) > 5 || !this.clearingAnimation){
+                d.show();
             }
-            previousDot = d;
+            // if(d.target.dist(previousDot.target) < this.size/4 && d.pos.dist(previousDot.pos) < this.size/6){
+            //     vertex(d.pos.x, d.pos.y);
+            // }else{
+            //     endShape(CLOSE);
+            //     beginShape();
+            // }
+            // previousDot = d;
         }        
 
         endShape(CLOSE);
@@ -75,10 +75,10 @@ class Text {
         //         }              
         //     } 
 
-        // ellipse(this.right, this.down, 5);
-        // ellipse(this.right, this.up, 5);
-        // ellipse(this.left, this.down, 5);
-        // ellipse(this.left, this.up, 5);
+        // ellipse(this.bounds.x, this.bounds.y, 5);
+        // ellipse(this.bounds.x, this.bounds.y + this.bounds.h, 5);
+        // ellipse(this.bounds.x + this.bounds.w, this.bounds.y, 5);
+        // ellipse(this.bounds.x + this.bounds.w, this.bounds.y + this.bounds.h, 5);
     }
 
     update() {
@@ -180,6 +180,111 @@ class Text {
     }
 }
 
+class NewText {
+    constructor(string, x, y, size = height * 0.11, color = "gray") { 
+
+        textAlign(CENTER, CENTER);
+
+        // Determine hitbox
+        this.bounds = font.textBounds(string, x, y + size*0.4, size);
+
+        // Save parameters
+        this.string = string;
+        this.horizontalAlign = CENTER;
+        this.verticalAlign = CENTER;
+        this.color = color;    
+        this.baseSize = size;
+        this.basePosition = createVector(x, y);
+
+        //State properties
+        this.positionVel = createVector();
+        this.sizeVel = 0;
+        this.position = createVector(x, y+50);
+        this.size = 0;
+        this.desiredPosition = createVector(x, y);
+        this.desiredSize = this.baseSize;
+
+
+
+        // Others
+        this.force = 200;
+        this.maxSpeed = 20;
+        this.minSpeed = .05;
+        this.forceDist = size / 4
+        this.interactive = 0;
+        this.active = 0;
+        this.clickedFlag = 0;
+    }
+
+    show() {
+        fill(this.color);
+        textFont(font);
+        textSize(this.size);
+        textAlign(this.horizontalAlign, this.verticalAlign);
+        text(this.string, this.position.x, this.position.y);
+
+        // ellipse(this.position.x, this.position.y, 5);
+
+        // ellipse(this.bounds.x, this.bounds.y, 5);
+        // ellipse(this.bounds.x, this.bounds.y + this.bounds.h, 5);
+        // ellipse(this.bounds.x + this.bounds.w, this.bounds.y, 5);
+        // ellipse(this.bounds.x + this.bounds.w, this.bounds.y + this.bounds.h, 5);
+    }
+
+    update() {
+        this.sizeVel = 0.1* (this.desiredSize - this.size);
+        this.positionVel = p5.Vector.sub(this.desiredPosition, this.position);
+        this.positionVel.mult(0.1);
+        if(this.interactive){
+            if(this.inArea()){
+                this.desiredSize = this.baseSize * 0.9
+                this.desiredPosition.x = this.basePosition.x + (mouseX - this.basePosition.x)/10;
+                this.desiredPosition.y = this.basePosition.y + (mouseY - this.basePosition.y)/10;
+            }else{
+                this.desiredSize = this.baseSize;
+                this.desiredPosition.x = this.basePosition.x
+                this.desiredPosition.y = this.basePosition.y
+            }
+        }   
+
+        this.position.add(this.positionVel);
+        this.size += this.sizeVel;     
+    }
+
+    changeText(newString) {
+    }
+
+    clicked() {
+        if (this.inArea() && this.interactive) {
+            for(let t of menu.texts){
+                t.clickedFlag = 0;
+            }
+            this.clickedFlag = 1;
+            this.clickFunction();
+        }
+    }
+
+    pressed() {
+        if (this.inArea()) {
+            this.pressedFunction();
+        }
+    }
+
+    inArea() {
+        if (mouseX < this.bounds.x || mouseX > this.bounds.x + this.bounds.w) return false;
+        if (mouseY < this.bounds.y || mouseY > this.bounds.y + this.bounds.h) return false;
+        return true;
+    }
+
+    clickFunction() {
+        //runFromMouse();
+    }
+
+    pressedFunction() {  
+    }
+}
+
+
 // class Letter {
 //     constructor(){
 //         this.dots = [];
@@ -190,7 +295,7 @@ class Text {
 //     }
 // }
 
-class Play extends Text {
+class Play extends NewText {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.interactive = 1;
@@ -203,7 +308,7 @@ class Play extends Text {
 
 }
 
-class Mode extends Text {
+class Mode extends NewText {
     constructor(string, x, y, size, color, diameter, val) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.value = val;
@@ -217,7 +322,7 @@ class Mode extends Text {
 
 }
 
-class Settings extends Text {
+class Settings extends NewText {
     constructor(string, x, y, size, color, diameter, val) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.interactive = 1;
@@ -230,7 +335,7 @@ class Settings extends Text {
 
 }
 
-class HomeMenu extends Text {
+class HomeMenu extends NewText {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.interactive = 1;
@@ -243,7 +348,7 @@ class HomeMenu extends Text {
 
 }
 
-class NewRound extends Text {
+class NewRound extends NewText {
     constructor(string, x, y, size, color, diameter) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.interactive = 1;
@@ -256,7 +361,7 @@ class NewRound extends Text {
 
 }
 
-class NextPlayer extends Text {
+class NextPlayer extends NewText {
     constructor(string, x, y, size, color, diameter, value) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.value = value;
@@ -269,7 +374,7 @@ class NextPlayer extends Text {
     }
 }
 
-class ShopItem extends Text {
+class ShopItem extends NewText {
     constructor(player, string, x, y, size, color, diameter, target, val, cost) {
         super(string, x, y, size, color, diameter); // call the super class constructor and pass in the name parameter
         this.player = player;
@@ -317,7 +422,7 @@ class ShopItem extends Text {
                 default:
                     break;
             }
-           this.player.money -= this.cost;
+            this.player.money -= this.cost;
         }        
         menu.texts[menu.texts.length - 1].changeText("Money: "+ this.player.money);
     }
