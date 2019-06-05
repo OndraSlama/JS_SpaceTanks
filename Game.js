@@ -225,8 +225,8 @@ class Game{
     }
 
     // endGameMenu(colorOfWinner, game = this) {
-    //     texts.push(new Text("  Winner!", width / 2, height * 0.3, height * 0.15, colorOfWinner));
-    //     texts.push(new Text("New game?", width * 0.5, height * 0.6));
+    //     texts.push(new NewText("  Winner!", width / 2, height * 0.3, height * 0.15, colorOfWinner));
+    //     texts.push(new NewText("New game?", width * 0.5, height * 0.6));
     //     texts.push(new Play("Yes", width * 0.4, height * 0.75, height * 0.10));
     //     texts.push(new HomeMenu("No", width * 0.6, height * 0.75, height * 0.10));
     //     game.colorOfWinnerMenu = color(colorOfWinner);
@@ -235,7 +235,7 @@ class Game{
     // }
 
     // endRoundMenu(colorOfWinner, game = this){
-    //     texts.push(new Text("Winner!", width/2, height/2, height*0.20, colorOfWinner));   
+    //     texts.push(new NewText("Winner!", width/2, height/2, height*0.20, colorOfWinner));   
     //     game.colorOfWinnerMenu = color(colorOfWinner);
     //     game.additiveAlpha = 0.003;
 
@@ -258,7 +258,7 @@ class Game{
     //     let row2 = height*0.5
     //     game.additiveAlpha = -0.01;
 
-    //     // texts.push(new Text("Player "+(index + 1), width*.5, height*0.06, height*0.11, color));
+    //     // texts.push(new NewText("Player "+(index + 1), width*.5, height*0.06, height*0.11, color));
        
         
     //     // Create interactive buttons
@@ -268,11 +268,11 @@ class Game{
     //     // 4 = explosion radius
     //     // 5 = projectile type
     //     fill(255);
-    //     texts.push(new Text("ARM",  col1 - width*0.08, row1, height*0.08, undefined));
-    //     texts.push(new Text("PWR",  col1 - width*0.08, row2, height*0.08, undefined));
-    //     texts.push(new Text("DMG",  col2 - width*0.08, row1, height*0.08, undefined));
-    //     texts.push(new Text("RAD",  col2 - width*0.08, row2, height*0.08, undefined));
-    //     // texts.push(new Text("Type", width*0.3, height*0.7, height*0.05, undefined));
+    //     texts.push(new NewText("ARM",  col1 - width*0.08, row1, height*0.08, undefined));
+    //     texts.push(new NewText("PWR",  col1 - width*0.08, row2, height*0.08, undefined));
+    //     texts.push(new NewText("DMG",  col2 - width*0.08, row1, height*0.08, undefined));
+    //     texts.push(new NewText("RAD",  col2 - width*0.08, row2, height*0.08, undefined));
+    //     // texts.push(new NewText("Type", width*0.3, height*0.7, height*0.05, undefined));
     //     // texts.push(new ShopItem(plr, "^", width*0.1, height*0.4, height*0.15, undefined, undefined, 2, 1, 700)); 
     //     // texts.push(new ShopItem(plr, "^", width*0.1, height*0.5, height*0.15, undefined, undefined, 3, 5, 500)); 
     //     // texts.push(new ShopItem(plr, "^", width*0.1, height*0.6, height*0.15, undefined, undefined, 4, 3, 550));
@@ -294,14 +294,14 @@ class Game{
 
     //     // Tank parameters
         
-    //     texts.push(new Text(round(plr.projectileExplosionRadius) + "",  col2 + width*0.08, row2, height*0.08, undefined));
-    //     texts.push(new Text(plr.projectileDamage + "",                  col2 + width*0.08, row1, height*0.08, undefined));
-    //     texts.push(new Text(plr.maxShotPower + "",                      col1 + width*0.08, row2, height*0.08, undefined));
-    //     texts.push(new Text(plr.maxHp + "",                             col1 + width*0.08, row1, height*0.08, undefined));
+    //     texts.push(new NewText(round(plr.projectileExplosionRadius) + "",  col2 + width*0.08, row2, height*0.08, undefined));
+    //     texts.push(new NewText(plr.projectileDamage + "",                  col2 + width*0.08, row1, height*0.08, undefined));
+    //     texts.push(new NewText(plr.maxShotPower + "",                      col1 + width*0.08, row2, height*0.08, undefined));
+    //     texts.push(new NewText(plr.maxHp + "",                             col1 + width*0.08, row1, height*0.08, undefined));
         
 
     //     // Money info - has to be last
-    //     texts.push(new Text(moneyInfo, width*.48, height*0.1, height*0.15, color));
+    //     texts.push(new NewText(moneyInfo, width*.48, height*0.1, height*0.15, color));
     // }
 
     end(){

@@ -44,14 +44,14 @@ class Menu {
     }
 
     clearMenu(){
-        menu.texts.forEach(t => {
-            t.dots.splice(0, t.dots.length);
-        });
+        // menu.texts.forEach(t => {
+        //     t.dots.splice(0, t.dots.length);
+        // });
         menu.texts.splice(0, menu.texts.length);;
     }
 
     roundCoutdown(){
-        menu.texts.push(new Text("New Round in: 3", width/2, height/2, height*0.20));
+        menu.texts.push(new NewText("New Round in: 3", width/2, height/2, height*0.20));
 
         setTimeout(function() {
             menu.texts[menu.texts.length - 1].changeText("New Round in: 2");
@@ -69,7 +69,7 @@ class Menu {
 
     homeMenu(){
         endGameSesions();
-        menu.texts.push(new Text('SpaceTanks', width/2, height*0.2, height*0.2,"white"));    
+        menu.texts.push(new NewText('SpaceTanks', width/2, height*0.2, height*0.2,"white"));    
         menu.texts.push(new Play("Quick play", width/2, height * 0.5))
         menu.texts.push(new Settings("Advanced Settings", width/2, height * 0.75))
     }
@@ -99,7 +99,7 @@ class Menu {
 
         
 
-        // texts.push(new Text("Player "+(index + 1), width*.5, height*0.06, height*0.11, color));
+        // texts.push(new NewText("Player "+(index + 1), width*.5, height*0.06, height*0.11, color));
                
         // Create interactive buttons
         // 1 = max Hp of tank
@@ -109,10 +109,10 @@ class Menu {
         // 5 = projectile type
 
         fill(255);
-        menu.texts.push(new Text("ARM",  col1 - width*0.08, row1, height*0.08, undefined));
-        menu.texts.push(new Text("PWR",  col1 - width*0.08, row2, height*0.08, undefined));
-        menu.texts.push(new Text("DMG",  col2 - width*0.08, row1, height*0.08, undefined));
-        menu.texts.push(new Text("RAD",  col2 - width*0.08, row2, height*0.08, undefined));
+        menu.texts.push(new NewText("ARM",  col1 - width*0.08, row1, height*0.08, undefined));
+        menu.texts.push(new NewText("PWR",  col1 - width*0.08, row2, height*0.08, undefined));
+        menu.texts.push(new NewText("DMG",  col2 - width*0.08, row1, height*0.08, undefined));
+        menu.texts.push(new NewText("RAD",  col2 - width*0.08, row2, height*0.08, undefined));
                
         menu.texts.push(new ShopItem(plr, "^",       col1,       row1 + height*0.05, height*0.15, color, undefined, 1, 15, 400));
         menu.texts.push(new ShopItem(plr, "^",       col1,       row2 + height*0.05, height*0.15, color, undefined, 2, 1, 300)); 
@@ -129,18 +129,18 @@ class Menu {
         } 
 
         // Tank parameters        
-        menu.texts.push(new Text(round(plr.projectileExplosionRadius) + "",  col2 + width*0.08, row2, height*0.08, undefined));
-        menu.texts.push(new Text(plr.projectileDamage + "",                  col2 + width*0.08, row1, height*0.08, undefined));
-        menu.texts.push(new Text(plr.maxShotPower + "",                      col1 + width*0.08, row2, height*0.08, undefined));
-        menu.texts.push(new Text(plr.maxHp + "",                             col1 + width*0.08, row1, height*0.08, undefined));
+        menu.texts.push(new NewText(round(plr.projectileExplosionRadius) + "",  col2 + width*0.08, row2, height*0.08, undefined));
+        menu.texts.push(new NewText(plr.projectileDamage + "",                  col2 + width*0.08, row1, height*0.08, undefined));
+        menu.texts.push(new NewText(plr.maxShotPower + "",                      col1 + width*0.08, row2, height*0.08, undefined));
+        menu.texts.push(new NewText(plr.maxHp + "",                             col1 + width*0.08, row1, height*0.08, undefined));
         
         // Money info - has to be last
-        menu.texts.push(new Text(moneyInfo, width*.48, height*0.1, height*0.15, color));
+        menu.texts.push(new NewText(moneyInfo, width*.48, height*0.1, height*0.15, color));
     }
 
     endRoundMenu(){        
         let colorOfWinner = menu.game.winner.color;
-        menu.texts.push(new Text("Winner!", width/2, height/2, height*0.20, colorOfWinner));   
+        menu.texts.push(new NewText("Winner!", width/2, height/2, height*0.20, colorOfWinner));   
         menu.color = color(colorOfWinner);
         menu.aplhaChangeRate = 0.003;
         menu.desiredAlpha = 0.2;
@@ -153,8 +153,8 @@ class Menu {
 
     endGameMenu() {       
         let colorOfWinner = menu.game.colorOfWinner;
-        menu.texts.push(new Text("Winner of game!", width / 2, height * 0.3, height * 0.15, colorOfWinner));
-        menu.texts.push(new Text("New game?", width * 0.5, height * 0.6));
+        menu.texts.push(new NewText("Winner of game!", width / 2, height * 0.3, height * 0.15, colorOfWinner));
+        menu.texts.push(new NewText("New game?", width * 0.5, height * 0.6));
         menu.texts.push(new Play("Yes", width * 0.4, height * 0.75, height * 0.10));
         menu.texts.push(new HomeMenu("No", width * 0.6, height * 0.75, height * 0.10));
         menu.color = color(colorOfWinner);

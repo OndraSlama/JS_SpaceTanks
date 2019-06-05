@@ -11,14 +11,14 @@ function settingsMenu(){
 // function goHome(){
 //     endGameSesions();
 
-    // texts.push(new Text('SpaceTanks', width/2, height*0.2, height*0.2,"white"));
+    // texts.push(new NewText('SpaceTanks', width/2, height*0.2, height*0.2,"white"));
 
     // texts.push(new Play("Quick play", width/2, height * 0.5))
     // texts.push(new Settings("Advanced Settings", width/2, height * 0.75))
 // }
 
 // function playNewRound(game){
-    // texts.push(new Text("New Round in: 3", width/2, height/2, height*0.20));
+    // texts.push(new NewText("New Round in: 3", width/2, height/2, height*0.20));
     // setTimeout(function() {
     //     texts[texts.length - 1].changeText("New Round in: 2");
     // }, textAnimationSpeed);
