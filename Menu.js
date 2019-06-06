@@ -81,6 +81,7 @@ class Menu {
     }
 
     shopMenu(index = 0){        
+        this.moneyInfo = "Money: "+ menu.game.players[index].money;
         let plr = menu.game.players[index];
         let color = menu.game.players[index].color;
         let col1 = width*0.33;
