@@ -4,7 +4,8 @@ class Menu {
         this.game;
         this.color = color("black");
         this.desiredAlpha = 0; 
-        this.aplhaChangeRate = 0.01;   
+        this.aplhaChangeRate = 0.01;  
+        this.moneyInfo = "0"
 
         this.currentAlpha = 0;
     }
@@ -79,14 +80,19 @@ class Menu {
         menu.texts.push(new Mode('2 Players', width*0.77, height*0.5, 70, "blue", 3, 2));
     }
 
-    shopMenu(index = 0){
-        let moneyInfo = "Money: "+ menu.game.players[index].money;
+    shopMenu(index = 0){        
         let plr = menu.game.players[index];
         let color = menu.game.players[index].color;
         let col1 = width*0.33;
         let col2 = width*0.66;
+
+        let spacer = height*0.1
         let row1 = height*0.3;
-        let row2 = height*0.5;
+        let row2 = row1 + spacer;
+        let row3 = row2 + spacer;
+        let row4 = row3 + spacer;
+        let row5 = row4 + spacer;
+        let row6 = row5 + spacer;
 
         /*menu.color = plr.color;
         menu.desiredAlpha = 0.05;
@@ -109,18 +115,21 @@ class Menu {
         // 5 = projectile type
 
         fill(255);
-        menu.texts.push(new NewText("ARM",  col1 - width*0.08, row1, height*0.08, undefined));
-        menu.texts.push(new NewText("PWR",  col1 - width*0.08, row2, height*0.08, undefined));
-        menu.texts.push(new NewText("DMG",  col2 - width*0.08, row1, height*0.08, undefined));
-        menu.texts.push(new NewText("RAD",  col2 - width*0.08, row2, height*0.08, undefined));
+        menu.texts.push(new NewText("ARM",  col1 - width*0.08, row1, height*0.06, undefined));
+        menu.texts.push(new NewText("PWR",  col1 - width*0.08, row2, height*0.06, undefined));
+        menu.texts.push(new NewText("DMG",  col1 - width*0.08, row3, height*0.06, undefined));
+        menu.texts.push(new NewText("RAD",  col1 - width*0.08, row4, height*0.06, undefined));
                
-        menu.texts.push(new ShopItem(plr, "^",       col1,       row1 + height*0.05, height*0.15, color, undefined, 1, 15, 400));
-        menu.texts.push(new ShopItem(plr, "^",       col1,       row2 + height*0.05, height*0.15, color, undefined, 2, 1, 300)); 
-        menu.texts.push(new ShopItem(plr, "^",       col2,       row1 + height*0.05, height*0.15, color, undefined, 3, 5, 600)); 
-        menu.texts.push(new ShopItem(plr, "^",       col2,       row2 + height*0.05, height*0.15, color, undefined, 4, 3, 350)); 
-        menu.texts.push(new ShopItem(plr, "Normal",  width*0.24, height*0.7,         height*0.1, color, undefined, 5, 1, 0)); 
-        menu.texts.push(new ShopItem(plr, "Shatter", width*0.5,  height*0.7,         height*0.1, color, undefined, 5, 2, 2983)); 
-        menu.texts.push(new ShopItem(plr, "Triple",  width*0.75, height*0.7,         height*0.1, color, undefined, 5, 3, 3333));
+        menu.texts.push(new ShopItem(plr, "^",       col1,      row1 + height*0.01,     height*0.10, "white", undefined, 1, 15, 400));
+        menu.texts.push(new ShopItem(plr, "^",       col1,      row2 + height*0.01,     height*0.10, "white", undefined, 2, 1, 300)); 
+        menu.texts.push(new ShopItem(plr, "^",       col1,      row3 + height*0.01,     height*0.10, "white", undefined, 3, 5, 600)); 
+        menu.texts.push(new ShopItem(plr, "^",       col1,      row4 + height*0.01,     height*0.10, "white", undefined, 4, 3, 350)); 
+        menu.texts.push(new ShopItem(plr, "Normal",  col2,      row1*0.8 + row1*0.2,    height*0.06, color, undefined, 5, 1, 0)); 
+        menu.texts.push(new ShopItem(plr, "Shatter", col2,      row2*0.8 + row1*0.2,    height*0.06, color, undefined, 5, 2, 2983)); 
+        menu.texts.push(new ShopItem(plr, "Triple ", col2,      row3*0.8 + row1*0.2,    height*0.06, color, undefined, 5, 3, 3333));
+        menu.texts.push(new ShopItem(plr, "Shotgun", col2,      row4*0.8 + row1*0.2,    height*0.06, color, undefined, 5, 4, 4242)); 
+        menu.texts.push(new ShopItem(plr, "Chain",   col2,      row5*0.8 + row1*0.2,    height*0.06, color, undefined, 5, 5, 2835)); 
+        menu.texts.push(new ShopItem(plr, "Guided ", col2,      row6*0.8 + row1*0.2,    height*0.06, color, undefined, 5, 6, 6969));
         
         if (index < menu.game.numberOfPlayers-1){
             menu.texts.push(new NextPlayer("Next player", width*0.5, height*0.85, height*0.12, undefined, undefined, index))
@@ -129,13 +138,14 @@ class Menu {
         } 
 
         // Tank parameters        
-        menu.texts.push(new NewText(round(plr.projectileExplosionRadius) + "",  col2 + width*0.08, row2, height*0.08, undefined));
-        menu.texts.push(new NewText(plr.projectileDamage + "",                  col2 + width*0.08, row1, height*0.08, undefined));
-        menu.texts.push(new NewText(plr.maxShotPower + "",                      col1 + width*0.08, row2, height*0.08, undefined));
-        menu.texts.push(new NewText(plr.maxHp + "",                             col1 + width*0.08, row1, height*0.08, undefined));
+        menu.texts.push(new NewText(round(plr.projectileExplosionRadius) + "",  col1 + width*0.07, row4, height*0.06, undefined));
+        menu.texts.push(new NewText(plr.projectileDamage + "",                  col1 + width*0.07, row3, height*0.06, undefined));
+        menu.texts.push(new NewText(plr.maxShotPower + "",                      col1 + width*0.07, row2, height*0.06, undefined));
+        menu.texts.push(new NewText(plr.maxHp + "",                             col1 + width*0.07, row1, height*0.06, undefined));
         
         // Money info - has to be last
-        menu.texts.push(new NewText(moneyInfo, width*.48, height*0.1, height*0.15, color));
+        menu.texts.push(new NewText(this.moneyInfo, width*.48, height*0.1, height*0.10, color));
+        this.moneyInfo = "Money: "+ menu.game.players[index].money;
     }
 
     endRoundMenu(){        

@@ -4,7 +4,7 @@ let canvasHeight;
 let backgroundColor;
 let font;
 let mouse;
-let textAnimationSpeed = 300;
+let textAnimationSpeed = 1000;
 let pressedKeys = []; // to store pressed keys
 
 // Controls

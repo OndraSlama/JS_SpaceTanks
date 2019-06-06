@@ -23,7 +23,7 @@ class Game{
             this.players.push(new Player('red', redPlayerControls));
             // players.push(new Player('blue', bluePlayerControld));
         }else if(this.numberOfPlayers == 2){
-            this.players.push(new Player('pink', redPlayerControls));
+            this.players.push(new Player('red', redPlayerControls));
             this.players.push(new Player('blue', bluePlayerControls));
         }
         if(!noMenu){
